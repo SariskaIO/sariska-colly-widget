@@ -17,13 +17,13 @@ module.exports = {
     ],
     output: {
         path: path.join.apply(null, context.concat("dist")),
-        filename: process.env.NODE_ENV === "production" ? '[name].bundle.js' : 'bundle1.js',
+        filename: process.env.NODE_ENV === "production" ? '[name].colly.widget.js' : 'bundle1.js',
         publicPath: 'http://localhost:8081/'
     },
     plugins: [
         //new BundleAnalyzerPlugin(),
         new MiniCssExtractPlugin({
-            filename: '[name].[contenthash].css'
+            filename: '[name].colly.widget.[contenthash].css'
         }),
         new webpack.DefinePlugin({
             BUILD_ENV: JSON.stringify(process.env.NODE_ENV),
@@ -33,14 +33,16 @@ module.exports = {
             apply: (compiler) => {
                   if ( process.env.NODE_ENV === "production"  ) {
                       compiler.hooks.afterEmit.tap('AfterEmitPlugin', (compilation) => {
-                          let fileContent  = fs.readFileSync("dist/main.bundle.js", "utf-8");
-                          const startIndex = fileContent.indexOf("https://sdk.sariska.io/main");
-                          const endIndex = startIndex + 52;
+                          let fileContent  = fs.readFileSync("dist/main.colly.widget.js", "utf-8");
+                          const startIndex = fileContent.indexOf("https://sdk.sariska.io/main.colly.widget");
+                          const endIndex = startIndex + 65;
                           const selectedContent  = fileContent.slice(startIndex, endIndex);
+
+                          console.log("selectedContent", selectedContent);
                           const distDir = fs.readdirSync("dist");
                           const cssFile = distDir.find(item=>item.indexOf(".css") >=0);
                           fileContent = fileContent.replace(selectedContent, `https://sdk.sariska.io/${cssFile}`);
-                          fs.writeFileSync("dist/main.bundle.js", fileContent);
+                          fs.writeFileSync("dist/main.colly.widget.js", fileContent);
                       });
                   }
             }

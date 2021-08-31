@@ -26,9 +26,8 @@
   },
   "scripts": {
     "start": "NODE_ENV=development ./node_modules/webpack-dev-server/bin/webpack-dev-server.js",
-    "build": "NODE_ENV=production webpack --config ./webpack.config.js && cp dist/main.bundle.js ../sariska-chrome-extension/content.js",
-    "build_flatbuffer": "flatc --ts ../messaging-service/rel/etc/sariska.fbs && mv  sariska_generated.ts ../sariska-webapp/lib/utils",
-    "deploy": "aws s3 cp dist/ s3://sdk.sariska.io --recursive --acl public-read && aws cloudfront create-invalidation --distribution-id E3RL1IE6WPHQ72 --paths /main.bundle.js"
+    "build": "NODE_ENV=production webpack --config ./webpack.config.js",
+    "deploy": "aws s3 cp dist/ s3://sdk.sariska.io --recursive --acl public-read && aws cloudfront create-invalidation --distribution-id E3RL1IE6WPHQ72 --paths /main.colly.widget.js"
   },
   "devDependencies": {
     "@babel/core": "^7.8.4",
