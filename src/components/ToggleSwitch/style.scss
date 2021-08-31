@@ -1,0 +1,26 @@
+@use "@material/switch/mdc-switch";
+.cb__toggleSwitch {
+  margin-top: 6px;
+  &__thumb {
+    border-color: white;
+    background-color: white;
+    &--enabled {
+      border-color: #27CED7!important;
+      background-color: #27CED7!important;
+    }
+  }
+  &__track {
+    border-color: white;
+    background-color: white;
+    &--enabled {
+      border-color: #27CED7!important;
+      background-color: #27CED7!important;
+    }
+  }
+  &__underlay::before {
+    background-color: #27CED7!important;
+  }
+  &__underlay::after {
+    background-color: #27CED7!important;
+  }
+}

@@ -1,0 +1,37 @@
+.cb__primaryBtn {
+  &__notification {
+    color: #fff;
+    padding: 1px 3px;
+    position: absolute;
+    left: 33px;
+    top: 30px;
+    font-size: 10px;
+    line-height: 1.3;
+    min-height: 13px;
+    border-radius: 2px;
+    margin: 0;
+    background: red;
+  }
+  &:hover {
+    background-color: #d0caca;
+  }
+  margin-left: 10px;
+  color: #27CED7;
+  background: white;
+  &--move {
+    cursor: move!important;
+  }
+  &__icon {
+    transform: rotate(0deg);
+    transition: transform 0s;
+    color: #27CED7;
+  }
+  &__rotateLeft {
+    transform: rotate(-180deg);
+    transition:  transform 0.5s;
+  }
+  &__rotateRight {
+    transform: rotate(180deg);
+    transition:   transform 0.5s;
+  }
+}

@@ -1,0 +1,478 @@
+import { getQueryStringValue,
+    syncWithParams,
+    syncMediaOptionsLocalStorage,
+    syncWithLocalStorage,
+    isMobile,
+    getDimensions,
+    skipToolbox ,
+    getToken,
+    getRandomColor,
+    getMeetingId,
+    getQueryStringValue} from "../../utils";
+import * as Constants from "../../constants";
+import { setL, getL, removeL } from "../../utils/local-storage";
+import { set, get } from "../../utils/session-storage";
+import {Socket,Presence} from "phoenix";
+import { ChannelMesssageEvents } from "../../constants";
+
+$ const mobile = isMobile();
+
+class {
+    onCreate(input) {
+        const persistedData = getL("cb__toolboxOptions") || {};
+        const sessionData = syncWithParams(persistedData.sessionData || {});
+
+        this.state = {
+             token: null,
+             socket: null,
+             channel: null,
+             widgetState: Constants.PRIMARY_BUTTON,
+             isChat: persistedData.isChat,
+             loading: false,
+             sessionData,
+             coordinateShift:{},
+             usersList: [],
+             messages:[],
+             isMouseDown: false,
+             name: '',
+             widgetInitialized: false,
+             newChatMessage: false,
+             toast: false,
+             toastText: "Thank you for the feedback.",
+             isMedia: persistedData.isMedia,
+             isPublisher: persistedData.isPublisher,
+             isDisconnected: persistedData.isDisconnected,
+             unreadMessage: persistedData.unreadMessage,
+             videoEnabled: persistedData.videoEnabled===undefined ? true : persistedData.videoEnabled,
+             audioEnabled: persistedData.audioEnabled===undefined ? true : persistedData.audioEnabled,
+             muteAll: persistedData.muteAll===undefined ? false : persistedData.muteAll,
+             videoWidget: persistedData.videoWidget===undefined ? true : persistedData.videoWidget,
+        }
+
+         if (getQueryStringValue("cbid",window.location)) {
+           this.state.widgetState = Constants.INPUT_WITH_OVERLAY;
+         } else if ( this.state.isDisconnected ) {
+            this.state.widgetState = Constants.PRIMARY_BUTTON;
+         } else {
+           this.joinSession();
+         }
+
+        this.documentClick = this.documentClick.bind(this);
+        window.addEventListener("beforeunload", this.beforeReload.bind(this));
+        document.addEventListener("keydown", this.documentKeyDown.bind(this), false);
+        document.addEventListener("mouseup", this.mouseUp.bind(this), false);
+        document.addEventListener("click", this.documentClick, false);
+        this.mouseMoveRef = this.mouseMove.bind(this);
+      }
+
+      documentKeyDown(event) {
+         if ( event.keyCode == 27 ) {
+            switch(this.state.widgetState) {
+               case Constants.PRIMARY_BUTTON_WITH_INPUT:
+                  this.state.widgetState = Constants.PRIMARY_BUTTON;
+                  break;
+               case Constants.REPORT_PROBLEM:
+                  this.dialogBoxAction(Constants.CANCEL_FEEDBACK_POPUP);
+                  break;
+               case Constants.INPUT_WITH_OVERLAY:
+                  this.dialogBoxAction(Constants.CANCEL_POPUP);
+                  break;
+            }
+         }
+      }
+
+      documentClick(e) {
+         if ( this.state.widgetState === Constants.PRIMARY_BUTTON_WITH_INPUT && !skipToolbox(e.target || e.srcElement)) {
+            this.state.widgetState = Constants.PRIMARY_BUTTON;
+         }
+      }
+
+      userSelectedMediaOptions(params) {
+         this.state.isMedia = true;
+         this.state.audioEnabled = params.audioEnabled;
+         this.state.videoEnabled = params.videoEnabled;
+      }
+
+      inputBoxValue(value) {
+         this.state.sessionData.name = value;
+      }
+
+      inputBoxAction(action) {
+         switch(action) {
+            case Constants.PRIMARY_BUTTON:
+               break;
+            case Constants.INPUT_WITH_OVERLAY:
+            case Constants.PRIMARY_BUTTON_WITH_INPUT:
+               this.joinSession(action);
+               break;
+         }
+      }
+
+      dialogBoxAction(state, feedbackSent) {
+         if ( state === Constants.JOIN_SESSION ) {
+            this.joinSession(state);
+         }
+
+         if (state === Constants.CANCEL_POPUP ) {
+            this.state.widgetState = Constants.PRIMARY_BUTTON;
+         }
+
+         if (state === Constants.CANCEL_FEEDBACK_POPUP && this.state.widgetInitialized) {
+             this.state.widgetState  = Constants.PRIMARY_BUTTON_WITH_WIDGET_OPEN;
+         } else if (state === Constants.CANCEL_FEEDBACK_POPUP) {
+             this.state.widgetState = Constants.PRIMARY_BUTTON;
+         }
+
+         if (feedbackSent) {
+             this.showToast("Thank you for feedback!");
+             this.hideToast(1500);
+         }
+      }
+
+      async joinSession() {
+         if (!this.state.sessionData.name) {
+            return;
+         }
+         this.state.loading = true;
+         this.state.sessionData.session_id = this.state.sessionData.session_id ? this.state.sessionData.session_id : getMeetingId();
+         const token = await getToken(this.state.sessionData);
+         if (!token) {
+             console.log("no token");
+         }
+
+         this.state.token = token;
+         const params = {token};
+         let socket = new Socket(Constants.MESSAGING_SERVICE_WEBSOCKET, {
+             params
+         });
+
+         socket.connect();
+
+         socket.onClose((reason) => {
+             socket.disconnect();
+         });
+
+         socket.onError((error) => {
+         });
+
+         this.state.socket = socket;
+         const channel = socket.channel(`chat:${this.state.sessionData.session_id}`, {});
+
+         channel.join()
+        .receive("ok", payload => {
+           console.log('on chat channel join')
+         })
+        .receive("error", reason => console.log(reason))
+        .receive("timeout", timeout => console.log(timeout))
+
+         this.state.channel = channel;
+
+         channel.on("user_joined",  (payload)=> {
+             const {user, room} = payload;
+             document.removeEventListener("click", this.documentClick, false);
+             this.state.loading  = false;
+             this.state.isPublisher = (user.id === room.created_by);
+             this.state.isDisconnected = false;
+             this.state.sessionData.created_by = room.created_by;
+             this.state.sessionData.id = user.id;
+             this.state.sessionData.name = user.name;
+             this.state.sessionData.email = user.email;
+             this.state.sessionData.avatar = user.avatar;
+             this.state.widgetState = Constants.PRIMARY_BUTTON_WITH_WIDGET_OPEN;
+             this.state.widgetInitialized = true;
+             this.showToast("Connected");
+         });
+
+         this.state.channel.on(ChannelMesssageEvents.PrivateMessage,  (payload)=> {
+              const messages =  this.state.messages;
+              messages.push(payload);
+              this.setStateDirty("messages");
+              if (!this.state.isChat) {
+                this.setPendingMessages();
+              }
+         });
+
+         this.state.channel.on(ChannelMesssageEvents.ArchivedMessage,  (payload)=> {
+              const messages =  this.state.messages;
+              messages.unshift(payload);
+              this.setStateDirty("messages");
+         });
+
+          let presence = new Presence(channel);
+
+           presence.onJoin((id, current, newPres) => {
+                const user = this.state.usersList.find(item=>item.id === id);
+                if (!user) {
+                    this.state.usersList.push({...newPres.metas[0], id: id, color: getRandomColor()});
+                }
+                this.setStateDirty("usersList");
+                if ( id === this.state.sessionData.id ) {
+                    this.showToast("Connected");
+                } else {
+                    this.showToast(`${newPres.metas[0].name} has joined`);
+                }
+            });
+
+            presence.onLeave((id, current, leftPres) => {
+                this.state.usersList = this.state.usersList.filter(item=>item.id !== id);
+                this.setStateDirty("usersList");
+                this.showToast(`${leftPres.metas[0].name} has left`);
+            })
+
+      }
+
+    primaryButtonAction(action) {
+        if (this.state.isMouseDown ) {
+           return;
+        }
+        switch(action) {
+              case Constants.PRIMARY_BUTTON_WITH_WIDGET_OPEN:
+              case Constants.PRIMARY_BUTTON_WITH_WIDGET_CLOSE:
+                 this.state.widgetState = action;
+                 break;
+              case Constants.AFTER_CLOSE_SESSION_PUBLISHER:
+              case Constants.AFTER_CLOSE_SESSION_SUBSCRIBER:
+                 this.state.widgetState = Constants.PRIMARY_BUTTON;
+                 break;
+              case Constants.PRIMARY_BUTTON:
+                 this.state.widgetState = Constants.PRIMARY_BUTTON_WITH_INPUT;
+                 if ( this.state.isDisconnected ) {
+                    this.state.widgetState = this.state.isPublisher ? Constants.AFTER_CLOSE_SESSION_PUBLISHER : Constants.AFTER_CLOSE_SESSION_SUBSCRIBER;
+                 }
+                 break;
+              case Constants.PRIMARY_BUTTON_WITH_INPUT:
+                 this.joinSession(action);
+                 break;
+              case Constants.INVITE_PEOPLE:
+                 this.state.widgetState = Constants.PRIMARY_BUTTON_WITH_WIDGET_OPEN;
+                 break;
+            }
+    }
+
+    setPendingMessages() {
+         this.state.unreadMessage = true;
+    }
+
+     closeCurrentSession() {
+         this.state.socket.disconnect();
+         this.state.isDisconnected = true;
+         this.state.widgetState = Constants.PRIMARY_BUTTON_WITH_WIDGET_OPEN;
+         if (this.state.isPublisher) {
+             this.state.widgetState = Constants.AFTER_CLOSE_SESSION_PUBLISHER;
+         } else {
+             this.state.widgetState = Constants.AFTER_CLOSE_SESSION_SUBSCRIBER;
+         }
+         this.state.widgetInitialized = false;
+      }
+
+      startNewSession() {
+          if (this.state.isMouseDown ) {
+             return;
+          }
+          const sessionData = this.state.sessionData;
+          sessionData.session_id = getMeetingId();
+          this.state.sessionData = sessionData;
+          this.state.isDisconnected = false;
+          this.state.unreadMessage = false;
+          this.state.loading = true;
+          this.joinSession();
+      }
+
+      joinPastSession() {
+          if (this.state.isMouseDown ) {
+             return;
+          }
+          const sessionData = this.state.sessionData;
+          this.state.loading = true;
+          this.state.isDisconnected  = false;
+          this.joinSession();
+      }
+
+      secondaryButtonAction(action) {
+         if (this.state.isMouseDown ) {
+            return;
+         }
+         switch(action) {
+           case Constants.IS_CHAT:
+              this.state.unreadMessage = false;
+              this.state[action] = true;
+              break;
+           case Constants.IS_MEDIA:
+              this.state[action] = true;
+              break;
+           case Constants.REPORT_PROBLEM:
+              this.state.widgetState = Constants.REPORT_PROBLEM;
+              break;
+           case Constants.INVITE_PEOPLE:
+              this.state.widgetState = Constants.INVITE_PEOPLE;
+              break;
+         }
+      }
+
+      closeChat() {
+         this.state.isChat = false;
+      }
+
+      onMediaControlChange(key, value) {
+         this.state[key] = value;
+      }
+
+      showToast(text) {
+         this.state.toastText = text;
+         this.state.toast = true;
+         this.hideToast(4000);
+      }
+
+      hideToast(timer) {
+         setTimeout(()=>{ this.state.toast = false}, timer);
+      }
+
+      mouseUp() {
+         setTimeout(()=>{ this.state.isMouseDown = false}, false);
+         clearTimeout(this.timeout);
+         this.skipMousemove = false;
+         document.removeEventListener("mousemove", this.mouseMoveRef, true);
+      }
+
+      mouseMove(e) {
+         if ( this.skipMousemove ) {
+           return;
+         }
+         const element = this.getEl("uiWidget");
+         const boudingRect  = element.getBoundingClientRect();
+         element.style.bottom = this.state.coordinateShift.y - e.clientY + this.state.coordinateShift.bottom + 'px';
+         element.style.right =  this.state.coordinateShift.x - e.clientX + this.state.coordinateShift.right+ 'px';
+      }
+
+      mouseDown(e) {
+         if (e.target.closest("#cb--media-container") || e.target.closest("#cb--chat-container")) {
+            this.skipMousemove = true;
+         }
+         const element = this.getEl("uiWidget");
+         this.timeout = setTimeout(()=>{ this.state.isMouseDown = true }, 300);
+         const boundingRect  = element.getBoundingClientRect();
+         const bottom = e.clientY - boundingRect.bottom;
+         const right = e.clientX - boundingRect.right;
+         const dim = getDimensions();
+         this.state.coordinateShift = { x: dim.x, y: dim.y, bottom, right};
+         document.addEventListener("mousemove", this.mouseMoveRef, true);
+      }
+
+
+      beforeReload() {
+         const data =  {
+            sessionData: this.state.sessionData,
+            isPublisher: this.state.isPublisher,
+            isDisconnected: this.state.isDisconnected,
+            unreadMessage: this.state.unreadMessage,
+            isChat: this.state.isChat,
+            isMedia: this.state.isMedia,
+            audioEnabled: this.state.audioEnabled,
+            videoEnabled: this.state.videoEnabled,
+            muteAll: this.state.muteAll,
+            videoWidget: this.state.videoWidget
+         }
+         setL("cb__toolboxOptions", data);
+      }
+
+      onDestroy() {
+         window.removeEventListener("beforeunload", this.beforeReload);
+         document.removeEventListener("keydown", this.documentKeyDown);
+      }
+
+  }
+
+<div key="uiWidget" onMouseUp("mouseUp") onMouseDown("mouseDown") class=["cb__uiWidget", state.isMouseDown && "cb__uiWidget--move", state.widgetState === Constants.PRIMARY_BUTTON_WITH_INPUT && "cb__uiWidget--flexColumn"]>
+    <if(state.widgetState === Constants.PRIMARY_BUTTON_WITH_INPUT)>
+        <Input
+            inputBoxValue = component.inputBoxValue.bind(component)
+            widgetState = state.widgetState
+            inputBoxAction = component.inputBoxAction.bind(component)
+        />
+    </if>
+
+    <else-if( state.widgetState === Constants.INPUT_WITH_OVERLAY )>
+        <DialogPopup
+            userSelectedMediaOptions = component.userSelectedMediaOptions.bind(component)
+            dialogBoxAction = component.dialogBoxAction.bind(component)
+            widgetState = state.widgetState
+            inputBoxAction = component.inputBoxAction.bind(component)
+            guestName = state.sessionData.guestName
+            inputBoxValue = component.inputBoxValue.bind(component)
+        />
+    </else-if>
+
+    <else-if( state.widgetState === Constants.PRIMARY_BUTTON_WITH_WIDGET_OPEN )>
+        <Controls
+           mobile = mobile
+           createdBy = state.sessionData.created_by
+           isPublisher = state.isPublisher
+           closeCurrentSession = component.closeCurrentSession.bind(component)
+           secondaryButtonAction = component.secondaryButtonAction.bind(component)
+           loading = state.loading
+        />
+    </else-if>
+
+    <else-if( state.widgetState === Constants.INVITE_PEOPLE )>
+        <SharingDrawer
+           sessionData = state.sessionData
+           secondaryButtonAction = component.secondaryButtonAction.bind(component)
+        />
+    </else-if>
+
+    <else-if( state.widgetState === Constants.REPORT_PROBLEM )>
+        <Feedback sessionData = state.sessionData dialogBoxAction = component.dialogBoxAction.bind(component) />
+    </else-if>
+
+    <else-if( state.widgetState === Constants.AFTER_CLOSE_SESSION_PUBLISHER )>
+        <Publisher startNewSession = component.startNewSession.bind(component) />
+    </else-if>
+
+    <else-if( state.widgetState === Constants.AFTER_CLOSE_SESSION_SUBSCRIBER )>
+        <Subscriber
+           joinPastSession = component.joinPastSession.bind(component)
+           startNewSession = component.startNewSession.bind(component)
+        />
+    </else-if>
+
+    <if(state.isMedia  && state.widgetInitialized && !state.isDisconnected)>
+        <MediaConnection
+           isPublisher = state.isPublisher
+           showToast = component.showToast.bind(component)
+           onMediaControlChange = component.onMediaControlChange.bind(component)
+           closeCurrentSession = component.closeCurrentSession.bind(component)
+           userSelectedMediaOptions = component.userSelectedMediaOptions.bind(component)
+           audioEnabled = state.audioEnabled
+           videoEnabled = state.videoEnabled
+           muteAll = state.muteAll
+           videoWidget = state.videoWidget
+           token = state.token
+        />
+    </if>
+
+    <if(state.widgetInitialized && !state.isDisconnected)>
+        <Chat
+           usersList=state.usersList
+           messages=state.messages
+           mobile = mobile
+           isChat = state.isChat
+           setPendingMessages = component.setPendingMessages.bind(component)
+           secondaryButtonAction = component.secondaryButtonAction.bind(component)
+           closeChat = component.closeChat.bind(component)
+           channel = state.channel
+           sessionData = state.sessionData
+        />
+    </if>
+    <PrimaryButton
+       isDisconnected = state.isDisconnected
+       unreadMessage = state.unreadMessage
+       loading = state.loading
+       isMouseDown = state.isMouseDown
+       widgetState = state.widgetState
+       secondaryButtonAction = component.secondaryButtonAction.bind(component)
+       primaryButtonAction = component.primaryButtonAction.bind(component)
+    />
+    <if(state.toast)>
+        <Toast text=state.toastText/>
+    </if>
+</div>

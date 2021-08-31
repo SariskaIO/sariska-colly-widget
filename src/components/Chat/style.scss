@@ -1,0 +1,241 @@
+.cb__chatWrapper {
+  position: fixed;
+  bottom: 0;
+  width: 340px!important;
+  flex-direction: column;
+  right: 230px;
+  background: white;
+  display: flex;
+  border-top-right-radius: 8px;
+  border-top-left-radius: 8px;
+
+  &--collasped {
+    width: 270px;
+  }
+
+  &--hidden {
+    display: none;
+  }
+
+  &--mobile {
+    left: 0;
+    top: 0;
+    width: 100%;
+    bottom: 0;
+    right: 0;
+  }
+
+  &__header {
+    border-top-right-radius: 8px;
+    border-top-left-radius: 8px;
+    height: 48px;
+    border-bottom: 1px solid #d8d8d8 !important;
+    box-shadow: 0 8px 6px -6px #ffffff;
+    background-color: white;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+
+    &--mobile {
+      position: fixed;
+      width: 100%;
+    }
+  }
+
+  &__leftControl {
+    width: 100%;
+    position: relative;
+    display: flex;
+    align-items: center;
+    flex: 3;
+  }
+
+  &__active {
+    position: absolute;
+    top: 27px;
+    font-weight: 400;
+    left: 58px;
+    font-size: 12px;
+    color: #90949c;
+  }
+
+  &__rightControl {
+    display: flex;
+    position: relative;
+    align-items: center;
+    width: 100%;
+    flex: 1;
+    svg {
+      color: #27CED7;
+    }
+  }
+
+  &__zoom {
+     flex: 1;
+     text-align: center;
+  }
+
+  &__close {
+    flex: 1;
+    text-align: center;
+  }
+
+  &__textarea {
+     font-family: Roboto, sans-serif!important;
+     flex: 5;
+     outline: 0 !important;
+     font-size: 16px;
+     padding-left: 20px;
+     border: 0 !important;
+     padding-top: 10px!important;
+     height: 60px !important;
+     resize: none;
+    color: black!important;
+  }
+
+  &__sendContainer {
+    padding-right: 10px;
+  }
+
+  &__send {
+    flex: 1;
+    background: white;
+    box-shadow: none;
+    svg {
+      fill: #27CED7;
+    }
+  }
+
+  &__name {
+    display: flex;
+    align-items: center;
+  }
+
+  .chatWrapper__name:not(:first-child) {
+    margin-top: 25px;
+  }
+
+  &__thumbnail {
+    height: 30px;
+    width: 30px;
+    color: white;
+    border-radius: 30px;
+    line-height: 30px;
+    text-align: center;
+    font-weight: bold;
+    font-size: 16px;
+  }
+
+  &__headerName {
+    width: 156px;
+    margin-left: 42px;
+    padding-bottom: 14px;
+    color: black!important;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: 600;
+    font-size: 14px;
+    padding-left: 10px;
+  }
+
+  &__name {
+    text-transform: capitalize;
+    font-weight: bold;
+  }
+
+  &__meta {
+    display: flex;
+    padding-left: 5px;
+    font-size: 16px!important;
+  }
+
+  &__headerIcons {
+    div {
+      height: 20px;
+      font-weight: 600;
+      width: 20px;
+      border-radius: 20px;
+      text-align: center;
+      line-height: 20px;
+      background-color: #22BE36;
+      position: absolute;
+      font-size: 14px;
+    }
+
+    &__0 {
+      top: 8px;
+      left: 24px;
+      color: white;
+    }
+
+    &__1 {
+      top: 21px;
+      font-size: 14px;
+      left: 15.5px;
+      color: white;
+    }
+
+    &--one {
+      top: 12px;
+      color: white;
+      height: 25px !important;
+      width: 25px !important;
+      border-radius: 25px !important;
+      line-height: 25px !important;
+    }
+  }
+
+  &__time {
+    line-height: 21px;
+    font-size: 12px;
+    margin-left: 10px;
+    font-weight: normal;
+  }
+
+  &__body {
+    height: 222px;
+    overflow: auto;
+    background-color: white;
+    padding: 10px;
+
+    &--mobile {
+      margin-top: 48px;
+      height: calc(100% - 112px);
+    }
+  }
+
+  &__headerBack {
+    top: 12px;
+    height: 25px !important;
+    width: 25px !important;
+    border-radius: 25px !important;
+    line-height: 25px !important;
+    background-color: black !important;
+  }
+
+  &__attachements {
+    position: absolute;
+    bottom: 90px;
+    max-height: 200px;
+    overflow: auto;
+    width: 100%;
+  }
+
+  &__footer {
+    border-top: 1px solid #d8d8d8 !important;
+    border-bottom: 1px solid #d8d8d8 !important;
+    background-color: white;
+    align-items: center;
+    display: flex;
+
+    &--mobile {
+      bottom: 0;
+      height: 64px;
+      position: fixed;
+      width: 100%;
+    }
+  }
+}
+
+

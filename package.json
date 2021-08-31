@@ -1,0 +1,106 @@
+{
+  "name": "client",
+  "description": "sariska webapp",
+  "version": "2.26.6",
+  "homepage": "https://www.sariska.io",
+  "author": "Brajendra Kumar",
+  "repository": {
+    "type": "git",
+    "url": "https://www.sariska.io"
+  },
+  "bugs": {
+    "url": "https://www.sariska.io"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://www.sariska.io"
+    }
+  ],
+  "main": "index.js",
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=4.0.0"
+  },
+  "scripts": {
+    "start": "NODE_ENV=development ./node_modules/webpack-dev-server/bin/webpack-dev-server.js",
+    "build": "NODE_ENV=production webpack --config ./webpack.config.js && cp dist/main.bundle.js ../sariska-chrome-extension/content.js",
+    "build_flatbuffer": "flatc --ts ../messaging-service/rel/etc/sariska.fbs && mv  sariska_generated.ts ../sariska-webapp/lib/utils",
+    "deploy": "aws s3 cp dist/ s3://sdk.sariska.io --recursive --acl public-read && aws cloudfront create-invalidation --distribution-id E3RL1IE6WPHQ72 --paths /main.bundle.js"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.8.4",
+    "@babel/plugin-proposal-class-properties": "^7.1.0",
+    "@babel/plugin-proposal-export-namespace-from": "^7.0.0",
+    "@babel/plugin-proposal-optional-chaining": "^7.2.0",
+    "@babel/plugin-transform-flow-strip-types": "^7.0.0",
+    "@babel/plugin-transform-runtime": "^7.12.1",
+    "@babel/preset-env": "^7.8.7",
+    "@marko/webpack": "^2.0.0",
+    "@types/dom-inputevent": "1.0.5",
+    "@types/node": "^8",
+    "autoprefixer": "^9.7.4",
+    "babel-loader": "^8.0.6",
+    "babel-plugin-transform-runtime": "^6.23.0",
+    "clean-webpack-plugin": "^3.0.0",
+    "css-loader": "^3.2.0",
+    "css-modules-typescript-loader": "^4.0.0",
+    "cssnano": "^4.1.10",
+    "history": "^4.10.1",
+    "mini-css-extract-plugin": "^0.9.0",
+    "nanologger": "^1.3.1",
+    "phoenix": "^1.4.11",
+    "postcss-cssnext": "^3.1.0",
+    "postcss-import": "^12.0.1",
+    "postcss-loader": "^3.0.0",
+    "postcss-nested": "^4.1.2",
+    "postcss-preset-env": "^6.7.0",
+    "sass": "^1.25.0",
+    "sass-loader": "^8.0.2",
+    "style-loader": "^1.1.2",
+    "sugarss": "^2.0.0",
+    "ts-loader": "^6.2.1",
+    "typescript": "^2",
+    "webpack": "^4.41.5",
+    "webpack-bundle-analyzer": "^3.6.0",
+    "webpack-cli": "^3.3.10",
+    "webpack-dev-server": "^3.10.1"
+  },
+  "keywords": [],
+  "dependencies": {
+    "@cliqz/adblocker": "^1.19.0",
+    "@cliqz/adblocker-webextension": "^1.19.0",
+    "@joeattardi/emoji-button": "https://github.com/brajendrak00068/emoji-button",
+    "@material/animation": "^5.1.0",
+    "@material/base": "^5.1.0",
+    "@material/button": "^5.1.0",
+    "@material/dialog": "^5.1.0",
+    "@material/elevation": "^5.1.0",
+    "@material/fab": "^5.1.0",
+    "@material/feature-targeting": "^5.1.0",
+    "@material/ripple": "^5.1.0",
+    "@material/switch": "^5.1.0",
+    "@material/textfield": "^5.1.0",
+    "@material/theme": "^5.1.0",
+    "@material/typography": "^5.1.0",
+    "aws-s3": "^2.0.5",
+    "babel-polyfill": "^6.26.0",
+    "compressorjs": "^1.0.6",
+    "diff-match-patch": "^1.0.5",
+    "flatbuffers": "^1.11.0",
+    "global": "^4.4.0",
+    "install": "^0.13.0",
+    "marko": "^4.18.34",
+    "node-sass": "^4.13.1",
+    "npm": "^6.13.7",
+    "rxjs": "6.5.4",
+    "sariska-media-transport": "git+https://github.com/SariskaIO/sariska-media-transport.git"
+  },
+  "directories": {
+    "lib": "lib",
+    "test": "test"
+  },
+  "license": "ISC"
+}

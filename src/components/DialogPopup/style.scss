@@ -1,0 +1,78 @@
+@use "@material/dialog/mdc-dialog";
+@use "@material/button/mdc-button";
+
+.cb__dialogPopup {
+   opacity: 1!important;
+   transform: scale(1)!important;
+   display: block!important;
+   &__container {
+     opacity: 1!important;
+     transform: scale(1) !important;
+   }
+
+   &__surface {
+     width: 700px!important;
+     background: white!important;
+     transform: scale(1) !important
+   }
+   &__opacity {
+     opacity: 1!important;
+   }
+
+   &__iconLeft {
+     display: flex;
+     &--enabledAudio {
+       color: #27CED7;
+     }
+     &--enabledVideo {
+       color: #27CED7;
+     }
+   }
+
+   &__content {
+     text-align: center;
+     padding: 15px!important;
+     border-bottom: 1px solid #e0e0e0!important;
+   }
+
+   &__title  {
+     background: rgba(0,0,0,0.04)!important;
+   }
+
+   &__iconLeftLabel {
+      margin-left: 10px;
+   }
+
+   hr {
+     background-color: #e0e0e0;
+     height: 1px;
+     border: 0;
+   }
+
+   &__iconLeftHeading {
+     color:black;
+     font-weight: bold;
+     font-size: 14px!important;
+   }
+
+   &__controls {
+     font-size: 14px!important;
+     display: flex;
+     padding: 8px;
+     justify-content: space-between;
+     align-items: baseline;;
+   }
+
+   &__button {
+     font-size: 14px!important;
+     background-color: black;
+     outline: 0!important;
+     color: #27CED7!important;
+   }
+   &__cancel {
+     color: #515D6B!important;
+   }
+   &__footer {
+     background: white!important;
+   }
+}

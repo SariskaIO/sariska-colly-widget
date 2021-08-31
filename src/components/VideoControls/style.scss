@@ -1,0 +1,32 @@
+.cb__videoControls {
+  display: flex;
+  height: 35px;
+  background: white;
+  color: white;
+  align-items: center;
+  text-align: center;
+  width: 220px;
+
+  &__icon {
+    height: 100%;
+    width: 25%;
+    cursor: pointer;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    svg {
+      fill: #27CED7;
+    }
+  }
+
+  &__endCall {
+    svg {
+      fill: red;
+    }
+  }
+
+  &__icon:hover {
+    background: #d0caca;
+  }
+}

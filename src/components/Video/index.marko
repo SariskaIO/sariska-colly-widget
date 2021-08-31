@@ -1,0 +1,59 @@
+import SariskaMediaTransport from "sariska-media-transport";
+import mic from "../Icons/mic.marko";
+import mic_off from "../Icons/mic_off.marko";
+import { MIC_TOGGLE } from "../../constants";
+
+import './index.scss';
+
+class {
+    onCreate(input) {
+       this.state = {
+          showTT: false
+       }
+   }
+
+   onMount() {
+      this.input.track.attach(this.getEl("video"));
+   }
+
+   mouseOut() {
+      this.state.showTT  = false;
+   }
+
+   mouseEnter() {
+      this.state.showTT  = true;
+   }
+
+   onClick(param, value) {
+      this.input.videoControlAction(param, !value);
+   }
+
+   onDestroy() {
+      this.input.track.detach(this.getEl("video"));
+   }
+}
+
+
+<div class="cb__video">
+   <video playsInline="1" autoPlay='1' key="video"/>
+   <if(component.input.track.isLocal()) >
+       <div class="cb__video__name">You</div>
+   </if>
+   <else>
+       <div class="cb__video__name">${component.input.user.name}</div>
+   </else>
+   <if(component.input.track.isLocal())>
+      <if(component.input.audioEnabled)>
+         <span onMouseOut("mouseOut") onMouseEnter("mouseEnter") onClick("onClick", MIC_TOGGLE, component.input.audioEnabled)  class="cb__video__mic" ><${mic}/></span>
+      </if>
+      <else>
+         <span onMouseOut("mouseOut") onMouseEnter("mouseEnter") onClick("onClick", MIC_TOGGLE, component.input.audioEnabled) class="cb__video__mic"  ><${mic_off}/></span>
+      </else>
+      <if(state.showTT)>
+         <Tooltip  style={top:"61px", right: "-40px"},  text=component.input.track.isMuted() ? "Stop My Audio" : "Start My Audio"/>
+      </if>
+   </if>
+   <if(component.input.track.isMuted() || (component.input.track.isLocal() && !component.input.videoEnabled))>
+      <div class="cb__video__thumbnail">${component.input.user.name && component.input.user.name[0]}</div>
+   </if>
+</div>

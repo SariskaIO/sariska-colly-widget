@@ -1,0 +1,49 @@
+.cb__attached {
+   display: flex;
+   height: 58px;
+   border-top: 1px solid #d8d8d8 !important;
+   width: 100%;
+   background: white;
+   &__thumbnail {
+     display: flex;
+     align-items: center;
+     justify-content: center;
+     height: 58px;
+     width: 58px;
+     background: #dedede;
+     img {
+       flex: 0 0 auto;
+       height: auto;
+       width: auto;
+       max-height: 100%;
+       max-width: 100%;
+     }
+  }
+
+  &__fileAttached {
+    font-weight: bold;
+  }
+
+  &__uploading {
+    font-weight: bold;
+    color: #606770;
+  }
+
+  &__filename {
+    display: flex;
+    justify-content: center;
+    color: #606770;
+    flex-direction: column;
+    flex: 14;
+    font-size: 12px;
+    padding-left: 8px!important;
+  }
+
+  &__close {
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    flex: 2;
+    flex-direction: column;
+  }
+}

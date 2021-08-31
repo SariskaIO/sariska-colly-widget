@@ -1,0 +1,27 @@
+import EmojiButton from "@joeattardi/emoji-button";
+import emojis from "../Icons/emojis.marko";
+import { CB__TOOLBOX_CONTAINER } from "../../constants";
+
+class {
+   onCreate(input) {
+      this.setEmoji = input.setEmoji;
+      this.state = { picker: null };
+   }
+
+   onMount() {
+       this.state.picker = new EmojiButton({zIndex: 99999999999999, position: "top", rootElement: document.getElementById(CB__TOOLBOX_CONTAINER)});
+       this.state.picker.on('emoji', emoji => {
+           this.setEmoji(emoji);
+       });
+   }
+
+   onClick() {
+      const button = this.getEl("button");
+      this.state.picker.togglePicker(button);
+   }
+}
+<div.cb__picker>
+    <FileUpload startFileUpload = component.input.startFileUpload type="photos" title="Add Photos" key="uploadFile"  sessionInfo = component.input.sessionInfo />
+    <div.cb__picker__emoji title="Choose an emoji" key="button" onClick("onClick")><${emojis}/></div>
+    <FileUpload startFileUpload = component.input.startFileUpload type="attachment" title="Add Files" key="uploadPhoto"  sessionInfo = component.input.sessionInfo />
+</div>

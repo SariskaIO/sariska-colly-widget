@@ -1,0 +1,60 @@
+import { getPresignedUrl, compressFile, getUniqueNumber } from "../../utils";
+import attachment from "../Icons/attachment.marko";
+import photos from "../Icons/photo.marko";
+
+class {
+   onCreate(input) {
+      this.state = {
+         sessionInfo: input.sessionInfo,
+         type: input.type
+      }
+      this.startFileUpload  = input.startFileUpload;
+   }
+
+   onChange(event) {
+      const id = getUniqueNumber();
+      const file = event.target.files[0];
+      const compressOptions = {
+        maxSizeMB: 1,
+        maxWidthOrHeight: 1920,
+        useWebWorker: true
+      }
+      const signedUrlOptions = {
+          fileName: file.name,
+          fileType: file.type
+      }
+      this.startFileUpload({id, name: file.name, type: this.state.type, size: file.size, status: 'loading'});
+      Promise.all([
+         getPresignedUrl(signedUrlOptions),
+         compressFile(file, this.state.type)
+      ]).then(values => {
+          const signedUrl  = values[0].presignedUrl;
+          const headers = {
+            "ACL":"public-read",
+            "Content-Disposition": "attachment"
+          }
+          return fetch(signedUrl, {method: 'PUT', body: values[1], headers})
+      })
+      .then(res=>{
+          const url = res.url.split("?")[0];
+          this.startFileUpload({id, url, status: 'done'});
+      })
+      .catch(function (error) {
+          this.startFileUpload({id, msg:'failed', status: 'failed'});
+      });
+   }
+
+   onClick() {
+      this.getEl("file").click();
+   }
+}
+<div.cb__upload onClick("onClick") title=component.input.title >
+    <if(state.type === "photos")>
+        <${photos}/>
+        <input.cb__upload__input onChange("onChange") accept="image/*" key="file" type="file" >
+    </if>
+    <else>
+       <${attachment}/>
+       <input.cb__upload__input onChange("onChange") key="file" type="file" >
+    </else>
+</div>

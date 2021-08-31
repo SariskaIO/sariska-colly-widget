@@ -1,0 +1,89 @@
+import * as Constants from "../../constants";
+import arrow_forward from "../Icons/arrow_forward.marko";
+import close from "../Icons/close.marko";
+import add from "../Icons/add.marko";
+import keyboard_backspace from "../Icons/keyboard_backspace.marko";
+import add from "../Icons/add.marko";
+import menu from "../Icons/menu.marko";
+import report_problem from "../Icons/report_problem";
+
+class {
+  onCreate(input) {
+     this.widgetState =  input.widgetState;
+     this.isMouseDown = input.isMouseDown;
+     this.secondaryButtonAction = input.secondaryButtonAction;
+     this.state = {
+        rotate: ""
+     }
+  }
+
+  onInput(input) {
+      this.widgetState =  input.widgetState;
+      this.isMouseDown = input.isMouseDown;
+  }
+
+  onClick() {
+      if (this.isMouseDown) {
+         return;
+      }
+      switch(this.widgetState) {
+        case Constants.ERROR:
+            return this.secondaryButtonAction(Constants.REPORT_PROBLEM);
+        case Constants.PRIMARY_BUTTON_WITH_INPUT:
+           return this.input.primaryButtonAction(this.widgetState);
+        case Constants.PRIMARY_BUTTON_WITH_WIDGET_OPEN:
+           return this.rotateLeft(()=>{this.input.primaryButtonAction (Constants.PRIMARY_BUTTON_WITH_WIDGET_CLOSE)});
+        case Constants.INVITE_PEOPLE:
+           return this.rotateLeft(()=>{this.input.primaryButtonAction(Constants.INVITE_PEOPLE)});
+        case Constants.PRIMARY_BUTTON_WITH_WIDGET_CLOSE:
+           return this.rotateRight(()=>{this.input.primaryButtonAction(Constants.PRIMARY_BUTTON_WITH_WIDGET_OPEN)});
+        case Constants.PRIMARY_BUTTON:
+           return this.rotateRight(()=>{this.input.primaryButtonAction(this.widgetState)});
+        case Constants.AFTER_CLOSE_SESSION_PUBLISHER:
+        case Constants.AFTER_CLOSE_SESSION_SUBSCRIBER:
+           return this.rotateLeft(()=>{this.input.primaryButtonAction(this.widgetState)});
+      }
+  }
+
+  rotateLeft(done) {
+     this.state.rotate = "cb__primaryBtn__rotateLeft";
+     setTimeout(()=>{  this.state.rotate = "";done();}, 300);
+  }
+
+  rotateRight(done) {
+     this.state.rotate = "cb__primaryBtn__rotateRight";
+     setTimeout(()=>{  this.state.rotate = "";done();}, 300);
+  }
+
+}
+
+<div onClick(component.input.loading ? "" : "onClick") class=["mdc-fab cb__primaryBtn"]>
+   <div class="mdc-fab__ripple"></div>
+   <if(component.input.loading)>
+       <Loader />
+   </if>
+   <else-if(component.input.widgetState === Constants.ERROR )>
+        <span class=["material-icons", "mdc-fab__icon", "cb__primaryBtn__icon", state.rotate]><${report_problem}/></span>
+   </else-if>
+   <else-if(component.input.widgetState === Constants.PRIMARY_BUTTON )>
+       <span class=["material-icons", "mdc-fab__icon", "cb__primaryBtn__icon", state.rotate]><${add}/></span>
+   </else-if>
+   <else-if(component.input.widgetState === Constants.PRIMARY_BUTTON_WITH_INPUT )>
+        <span class=["material-icons", "mdc-fab__icon", "cb__primaryBtn__icon", state.rotate]><${arrow_forward}/></span>
+   </else-if>
+   <else-if(component.input.widgetState === Constants.PRIMARY_BUTTON_WITH_WIDGET_OPEN )>
+       <span class=["material-icons", "mdc-fab__icon", "cb__primaryBtn__icon", state.rotate]><${close}/></span>
+   </else-if>
+   <else-if(component.input.widgetState === Constants.PRIMARY_BUTTON_WITH_WIDGET_CLOSE )>
+       <span class=["material-icons", "mdc-fab__icon", "cb__primaryBtn__icon", state.rotate]><${menu}/></span>
+   </else-if>
+   <else-if(component.input.widgetState === Constants.INVITE_PEOPLE )>
+      <span class=["material-icons", "mdc-fab__icon", "cb__primaryBtn__icon", state.rotate]><${keyboard_backspace}/></span>
+   </else-if>
+   <else-if(component.input.widgetState === Constants.AFTER_CLOSE_SESSION_PUBLISHER || component.input.widgetState === Constants.AFTER_CLOSE_SESSION_SUBSCRIBER )>
+       <span class=["material-icons", "mdc-fab__icon", "cb__primaryBtn__icon", state.rotate]><${close}/></span>
+   </else-if>
+   <if(component.input.unreadMessage && !component.input.isDisconnected)>
+       <span.cb__primaryBtn__notification>1</span>
+   </if>
+</div>

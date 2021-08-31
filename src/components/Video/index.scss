@@ -1,0 +1,50 @@
+.cb__video {
+  height: 123px !important;
+  width: 218px !important;
+  position: relative;
+  &__name {
+    color: white;
+    position: absolute;
+    bottom: 8px;
+    left: 8px;
+    z-index: 9;
+    font-size: 14px!important;
+  }
+  &__mic {
+    color: white;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    z-index: 9;
+    cursor: pointer;
+    svg {
+      fill: white;
+    }
+  }
+
+  &__menuVert {
+    position: absolute;
+    top: 0;
+    right: 0;
+    cursor: pointer;
+  }
+
+  &__thumbnail {
+    position: absolute;
+    text-align: center;
+    top: 0;
+    left: -1px;
+    font-size: 40px;
+    color: green;
+    background: #d0caca;
+    bottom: -1px;
+    right: -2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  video {
+     width: 220px !important;
+  }
+}

@@ -1,0 +1,67 @@
+import { CANCEL_FEEDBACK_POPUP, GOOGLE_API_FEEDBACK_URL } from "../../constants";
+
+class {
+  onCreate(input) {
+     this.dialogBoxAction = input.dialogBoxAction;
+     this.sessionData = input.sessionData;
+     this.state = {
+        sending: false,
+        description: ""
+     }
+  }
+
+  onMount() {
+     const textarea = this.getEl("textarea");
+     textarea && textarea.focus();
+  }
+
+  onInputValue(event) {
+     event.stopPropagation();
+     const value = event.target.value;
+     this.state.description = value;
+  }
+
+  reportIssue() {
+     this.state.sending = true;
+     let formData = new FormData();
+     formData.append('entry.281238650', this.sessionData.user && this.sessionData.user.name || "Guest");
+     formData.append('entry.1064787732', this.state.description );
+     fetch(GOOGLE_API_FEEDBACK_URL, {mode: "no-cors", method: "post", body: formData })
+     .then( (response) => {
+        this.state.sending = false;
+        this.dialogBoxAction(CANCEL_FEEDBACK_POPUP, true);
+     })
+     .catch((error)=>{
+        console.log('error', error)
+     })
+  }
+}
+
+<div class="cb__feedback mdc-dialog" role="alertdialog" aria-modal="true" aria-labelledby="my-dialog-title" aria-describedby="my-dialog-content">
+  <div class="mdc-dialog__container cb__feedback__container">
+    <div class="mdc-dialog__surface cb__feedback__surface">
+     <if(state.sending)>
+       <div class=["mdc-dialog__content cb__feedback__content", state.sending && "cb__feedback__content--sending"] id="my-dialog-content">
+           <h2 class=["mdc-dialog__content cb__feedback__title", state.sending && "cb__feedback__title--sending"] >Sending Feedback...</h2>
+       </div>
+     </if>
+     <else>
+      <h2 class="mdc-dialog__title cb__feedback__title">Send Feedback</h2>
+      <div class="mdc-dialog__content cb__feedback__content"   id="my-dialog-content">
+           <textarea on-input('onInputValue') value = state.description  key="textarea" placeholder="Leave product feedback or share your ideas. This isn't a way to contact support, as you typically won't receive a response." class="cb__feedback__textarea" type="text"></textarea>
+      </div>
+      <footer class="cb__feedback__footer mdc-dialog__actions">
+         <button onClick(()=>{ component.input.dialogBoxAction(CANCEL_FEEDBACK_POPUP)}) class="mdc-button cb__feedback__button cb__feedback__cancel">
+            <div class="mdc-button__ripple"></div>
+            <span class="mdc-button__label">Cancel</span>
+         </button>
+         <button onClick("reportIssue") class="mdc-button cb__feedback__button cb__feedback__send">
+            <div class="mdc-button__ripple"></div>
+            <span class="mdc-button__label">Send</span>
+         </button>
+      </footer>
+     </else>
+    </div>
+  </div>
+  <div class="mdc-dialog__scrim cb__feedback__opacity"></div>
+</div>

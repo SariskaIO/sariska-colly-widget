@@ -1,0 +1,45 @@
+import { PRIMARY_BUTTON, PRIMARY_BUTTON_WITH_WIDGET } from "../../constants";
+
+class {
+
+  onCreate(input) {
+    this.state  = {
+       name: "",
+       placeholder: true
+    }
+  }
+
+  keyDown(event) {
+     if (event.which == 13 || event.keyCode == 13) {
+        this.input.inputBoxAction(this.input.widgetState);
+     }
+  }
+
+  onMount() {
+     const inputField = this.getEl("inputField");
+     inputField && inputField.focus();
+  }
+
+  onInputValue(event) {
+     event.stopPropagation();
+     const value = event.target.value;
+     this.state.name = value;
+     this.input.inputBoxValue(this.state.name)
+     if ( this.state.name ) {
+        this.state.placeholder = false;
+     } else {
+       this.state.placeholder = true;
+     }
+  }
+
+}
+
+<div class=["cb__inputContainer", "mdc-text-field", !component.input.dialog && "mdc-elevation--z6", component.input.dialog && "cb__inputContainer--overlay"]>
+  <input key="inputField" class="mdc-text-field__input cb__inputContainer__input" on-input('onInputValue') value=state.name onKeyDown("keyDown")
+         type="text"
+         id="my-text-field"
+         aria-label="Full-Width Text Field">
+       <if(state.placeholder)>
+          <label class="mdc-floating-label cb__inputContainer__placeholder" for="my-text-field">Enter your name</label>
+       </if>
+</div>

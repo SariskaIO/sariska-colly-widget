@@ -1,0 +1,102 @@
+import { INVITE_PEOPLE, IS_MEDIA, SECRET_SALT } from "../../constants";
+import Copy from "../Icons/copy.marko";
+import Email from "../Icons/email.marko";
+import Whatsapp from "../Icons/whatsapp.marko";
+import Facebook from "../Icons/facebook.marko";
+import Share from "../Icons/share.marko";
+import { getURL, updateQueryStringParameter } from "../../utils";
+
+class {
+  onCreate(input) {
+     this.state = {
+       tooltip:  false
+     };
+  }
+
+  startTooltip() {
+     this.state.tooltip = true;
+     setTimeout(()=>{
+       this.state.tooltip = false
+     }, 500);
+  }
+
+  openNativeDrawer(url) {
+     if (navigator.share) {
+         navigator.share({
+               title: "Share",
+               url: url
+         }).then(() => {
+         })
+         .catch(err => {
+         });
+     }
+  }
+
+  copyURL(sessionData) {
+  console.log("sessionData", sessionData);
+     const element  =  this.el.querySelector('#cb__clipboard');
+     let url  =  updateQueryStringParameter(window.location.href, "cbid", sessionData.session_id);
+
+     console.log("url", url);
+
+         url  =  updateQueryStringParameter(url, "guestname", sessionData.name);
+
+         console.log("url", url);
+     element.setAttribute("value", url);
+     element.select();
+     document.execCommand('copy');
+     this.startTooltip();
+     this.startMedia();
+  }
+
+  startMedia() {
+     this.input.secondaryButtonAction(IS_MEDIA);
+  }
+}
+
+
+<div.cb__sharableOption>
+   <div class="cb__sharableOption__menu">
+      <label  class="mdc-elevation--z6">Copy and share URL</label><input.cb__sharableOption__clipboard id="cb__clipboard" type="text" />
+      <div onClick("copyURL", component.input.sessionData) class="mdc-fab mdc-fab--mini cb__sharableOption__button">
+          <div class="mdc-fab__ripple"></div>
+          <span class="material-icons mdc-fab__icon"><${Copy}/></span>
+          <if(state.tooltip)>
+             <Tooltip style={top:"-31px"}, text="Copied!"/>
+          </if>
+      </div>
+   </div>
+   <if(navigator.share)>
+      <div class="cb__sharableOption__menu">
+        <label class="mdc-elevation--z6 mdc-typography">Share</label>
+        <a onClick("openNativeDrawer", component.input.url) target="_blank" class="mdc-fab mdc-fab--mini cb__sharableOption__button">
+        <div class="mdc-fab__ripple"></div>
+           <span class="material-icons mdc-fab__icon"><${Share}/></span>
+        </a>
+      </div>
+   </if>
+   <else>
+       <div class="cb__sharableOption__menu">
+          <label class="mdc-elevation--z6 mdc-typography">Share on Email</label>
+          <a onClick("startMedia") href="https://mail.google.com/mail/?view=cm&fs=1&to=&body="+component.input.url target="_blank" class="mdc-fab mdc-fab--mini cb__sharableOption__button">
+             <div class="mdc-fab__ripple"></div>
+             <span class="material-icons mdc-fab__icon"><${Email}/></span>
+          </a>
+       </div>
+       <div class="cb__sharableOption__menu">
+           <label  class="mdc-elevation--z6 mdc-typography">Share on whatsapp</label>
+           <a onClick("startMedia") href="https://wa.me/?text="+component.input.url target="_blank" class="mdc-fab mdc-fab--mini cb__sharableOption__button">
+                <div class="mdc-fab__ripple"></div>
+                <span class="material-icons mdc-fab__icon"><${Whatsapp}/></span>
+           </a>
+       </div>
+       <div class="cb__sharableOption__menu">
+           <label  class="mdc-elevation--z6 mdc-typography">Share on facebook</label>
+           <a onClick("startMedia") href="https://www.facebook.com/sharer.php?u="+component.input.url  target="_blank"  class="mdc-fab mdc-fab--mini cb__sharableOption__button">
+               <div class="mdc-fab__ripple"></div>
+               <span class="material-icons mdc-fab__icon"><${Facebook}/></span>
+           </a>
+       </div>
+   </else>
+</div>
+

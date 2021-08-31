@@ -1,0 +1,74 @@
+import document from "../Icons/document.marko";
+import download from "../Icons/download.marko";
+import { formatBytes, getFileNameFromUrl, urlify } from "../../utils";
+import close from "../Icons/close.marko";
+
+class {
+   onCreate(input) {
+      this.state = {
+        documentOverlay: false,
+        imageOverlay: false
+      }
+   }
+
+   mouseEnter(e) {
+      this.state.documentOverlay = true;
+   }
+
+   mouseOut(e) {
+      this.state.documentOverlay = false;
+   }
+
+   showImageOverlay() {
+      window.document.addEventListener("keydown", this.keyDown.bind(this));
+      this.state.imageOverlay = true;
+   }
+
+   keyDown(e) {
+      if (e.keyCode === 27) {
+         window.document.removeEventListener("keydown", this.keyDown);
+         this.state.imageOverlay = false;
+      }
+   }
+
+   hideImageOverlay() {
+      this.state.imageOverlay = false;
+   }
+
+   onDestroy() {
+      window.document.removeEventListener("keydown", this.keyDown);
+   }
+}
+
+<div class=["cb__messageItem", (component.input.messageItem.content_type === "attachment" ||  component.input.messageItem.content_type === "photos") && "cb__messageItem--padding"]>
+    <if(component.input.messageItem.content_type === "photos")>
+       <img.cb__messageItem__photos src=component.input.messageItem.content onClick("showImageOverlay") />
+       <if(state.imageOverlay)>
+          <div.cb__messageItem__imageOverlay>
+             <img src=component.input.messageItem.content />
+             <div.cb__messageItem__closeButton onClick("hideImageOverlay") ><${close}/></div>
+          </div>
+       </if>
+    </if>
+
+    <else-if(component.input.messageItem.content_type === "text")>
+       <p.cb__messageItem__text>$!{urlify(component.input.messageItem.content)}</p>
+    </else-if>
+
+    <else-if(component.input.messageItem.content_type === "emoji")>
+       <p.cb__messageItem__emoji>${component.input.messageItem.content}</p>
+    </else-if>
+
+    <else-if(component.input.messageItem.content_type === "attachment")>
+       <a.cb__messageItem__attachment download target="_blank" href=component.input.messageItem.content onMouseOut("mouseOut") onMouseOver("mouseEnter") >
+          <div.cb__messageItem__file><${document}/></div>
+          <div.cb__messageItem__name>${getFileNameFromUrl(component.input.messageItem.content)}</div>
+          <if(state.documentOverlay)>
+             <div.cb__messageItem__overlay title=getFileNameFromUrl(component.input.messageItem.content)>
+               <${download}/>
+               <div.cb__messageItem__download>Download</div>
+             </div>
+          </if>
+       </a>
+    </else-if>
+</div>

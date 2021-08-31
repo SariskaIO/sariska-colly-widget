@@ -1,0 +1,28 @@
+.cb__mediaContainer {
+  position: fixed;
+  left: 10px;
+  bottom: 100px;
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+
+  &__local {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: grey;
+  }
+
+  &__widget {
+    &--hidden {
+      display: none;
+    }
+  }
+
+  &__item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: grey;
+  }
+}

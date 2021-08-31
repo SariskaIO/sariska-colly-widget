@@ -1,0 +1,8 @@
+import SariskaMediaTransport from "sariska-media-transport";
+
+
+<for|track, index| of=component.input.localTracks>
+   <if(track.isVideoTrack() && component.input.videoWidget)>
+       <Video videoEnabled=component.input.videoEnabled videoControlAction=component.input.videoControlAction audioEnabled=component.input.audioEnabled user = component.input.conference.getLocalUser() key=track.track.id track=track />
+   </if>
+</for>

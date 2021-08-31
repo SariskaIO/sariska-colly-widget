@@ -1,0 +1,8 @@
+import CustomMouse from "../Icons/custom-mouse.marko";
+import { inIframe } from "../../utils";
+$ const withinFrame = inIframe();
+
+<div class=["cb__customMouse", withinFrame && "cb__customMouse--hidden"] id=component.input.id  style={fill: component.input.color}>
+    <${CustomMouse}/>
+    <div class="cb__customMouse__userName" id=component.input.id style={ "background-color": component.input.color }>${component.input.name}</div>
+</div>

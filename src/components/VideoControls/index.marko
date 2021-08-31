@@ -1,0 +1,104 @@
+import { VOLUME_TOGGLE, VIDEO_TOGGLE, WIDGET_TOGGLE, CALL_END, TOGGLE_RECORDING } from "../../constants";
+import volume_up from "../Icons/volume_up.marko";
+import volume_off from "../Icons/volume_off.marko";
+import videocam from "../Icons/videocam.marko";
+import videocam_off from "../Icons/videocam_off.marko";
+import minimize from "../Icons/minimize.marko";
+import maximize from "../Icons/maximize.marko";
+import call_end from "../Icons/call_end.marko";
+import recording_on from "../Icons/recording_on.marko";
+import recording_off from "../Icons/recording_off.marko";
+
+class {
+    onCreate(input) {
+        this.state = {
+           volumeTT: false,   //tooltips......
+           webcamTT: false,
+           minimizeTT: false,
+           callTT: false,
+           call: false,
+           recordingTT: false
+        }
+    }
+
+    mouseEnter(param) {
+        this.state[param] = true;
+    }
+
+    mouseOut(param) {
+       this.state[param] = false;
+    }
+
+    onClick(param, value) {
+        this.state.minimizeTT = false;
+        this.input.videoControlAction(param, !value);
+    }
+
+    closeSession() {
+        this.input.closeSession();
+    }
+}
+
+<div class="cb__videoControls mdc-elevation--z6">
+    <div class="cb__videoControls__icon" onClick("onClick", TOGGLE_RECORDING, component.input.recordingEnabled)  onMouseOut("mouseOut", "recordingTT") onMouseEnter("mouseEnter", "recordingTT")>
+        <div class="material-icons mdc-fab__icon">
+            <if(component.input.muteAll)>
+                 <${recording_on}/>
+            </if>
+            <else>
+               <${recording_off}/>
+            </else>
+        </div>
+        <if(state.recordingTT)>
+           <Tooltip style={top:"-33px", left: 0},  text = component.input.recordingEnabled  ? "Stop Recording" : "Start Recording" />
+        </if>
+    </div>
+
+    <div class="cb__videoControls__icon" onClick("onClick", VOLUME_TOGGLE, component.input.muteAll)  onMouseOut("mouseOut", "volumeTT") onMouseEnter("mouseEnter", "volumeTT")>
+        <div class="material-icons mdc-fab__icon">
+            <if(component.input.muteAll)>
+                 <${volume_off}/>
+            </if>
+            <else>
+               <${volume_up}/>
+            </else>
+        </div>
+        <if(state.volumeTT)>
+           <Tooltip style={top:"-31px", width: "60px"},  text = component.input.muteAll ? "Unmute" : "Mute All" />
+        </if>
+    </div>
+    <div class="cb__videoControls__icon" onClick("onClick", VIDEO_TOGGLE, component.input.videoEnabled) onMouseOut("mouseOut", "webcamTT") onMouseEnter("mouseEnter", "webcamTT")>
+        <div class="material-icons mdc-fab__icon">
+            <if(component.input.videoEnabled)>
+                <${videocam}/>
+            </if>
+            <else>
+                <${videocam_off}/>
+            </else>
+        </div>
+        <if(state.webcamTT)>
+            <Tooltip style={top:"-31px"},  text = component.input.videoEnabled ? "Stop Video" : "Start Video" />
+        </if>
+    </div>
+    <div class="cb__videoControls__icon"  onClick("closeSession") onMouseOut("mouseOut", "callTT") onMouseEnter("mouseEnter", "callTT")>
+        <div class="cb__videoControls__endCall material-icons mdc-fab__icon">
+            <${call_end}/>
+        </div>
+        <if(state.callTT)>
+            <Tooltip style={top:"-31px"},  text = component.input.isPublisher ? "End Session": "Leave session" />
+        </if>
+    </div>
+    <div  class="cb__videoControls__icon" onClick("onClick", WIDGET_TOGGLE, component.input.videoWidget) onMouseOut("mouseOut", "minimizeTT") onMouseEnter("mouseEnter", "minimizeTT")>
+        <div class="material-icons mdc-fab__icon">
+            <if(component.input.videoWidget)>
+               <${minimize}/>
+            </if>
+            <else>
+               <${maximize}/>
+            </else>
+       </div>
+        <if(state.minimizeTT)>
+           <Tooltip  style={top:"-31px"},  text = component.input.videoWidget ? "Minimize" : "Maximize"/>
+        </if>
+    </div>
+</div>

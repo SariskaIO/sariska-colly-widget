@@ -1,0 +1,23 @@
+.cb__customMouse {
+  position: fixed;
+  top:0;
+  left: 0;
+  z-index: 2147483637;
+  svg {
+    height: 24px;
+    width: 24px;
+  }
+  &__userName {
+    font-family: Roboto, sans-serif;
+    padding: 5px;
+    font-size: 14px;
+    line-height: 16px;
+    color: white;
+    font-weight: 500;
+    margin-left: 14px;
+    border-radius: 5px;
+  }
+  &--hidden {
+    display: none;
+  }
+}

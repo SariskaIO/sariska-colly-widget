@@ -1,0 +1,76 @@
+@use "@material/dialog/mdc-dialog";
+@use "@material/button/mdc-button";
+
+.cb__feedback {
+  opacity: 1 !important;
+  transform: scale(1) !important;
+  display: block !important;
+
+  hr {
+    border-top: 1px solid #e0e0e0 !important;
+  }
+
+  &__title {
+    background: black;
+    text-align: left;
+    font-size: 20px !important;
+    background: rgba(0,0,0,0.04);
+    &--sending {
+      text-align: center;
+    }
+  }
+
+  &__container {
+    opacity: 1 !important;
+    transform: scale(1) !important;
+
+    &--sending {
+      padding: 0 !important;
+    }
+  }
+
+  &__surface {
+    background: white !important;
+    transform: scale(1) !important;
+    min-width: 480px!important;
+  }
+
+  &__content {
+    font-family: Roboto, sans-serif!important;
+    padding-bottom: 0 !important;
+    border-bottom: 1px solid #e0e0e0 !important;
+
+    &--sending {
+      padding: 0 !important;
+      border-bottom: 0px solid #e0e0e0 !important;
+    }
+  }
+
+  &__opacity {
+    opacity: 1;
+  }
+
+  &__cancel {
+    font-size: 14px !important;
+    color: red !important;
+  }
+
+  &__textarea {
+    font-family: Roboto, sans-serif!important;
+    padding-top: 20px;
+    height: 140px;
+    font-size: 16px !important;
+    outline: none !important;
+    border: 0 !important;
+    width: 100% !important;
+  }
+
+  &__footer {
+    background: white !important;
+  }
+
+  &__send {
+    font-size: 14px!important;
+    color: #27CED7!important;
+  }
+}

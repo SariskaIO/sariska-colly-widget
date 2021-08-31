@@ -1,0 +1,41 @@
+@use "@material/ripple/mdc-ripple";
+
+.cb__subscriber {
+  display: flex;
+  flex-direction: column;
+  justify-content: right;
+  align-items: flex-end;
+  margin: 8px;
+
+  &__menu {
+    display: flex;
+    align-items: center;
+    margin-top: 7px;
+  }
+
+  svg {
+    fill: #27CED7;
+  }
+
+  &__menu > label {
+    padding: 6px;
+    background-color: white;
+    border-radius: 5px;
+    font-size: 14px;
+    color: #606770;
+    line-height: normal !important;
+    margin: 0;
+    font-weight: 400;
+  }
+
+  &__button {
+    display: flex !important;
+    text-decoration: none;
+    margin-left: 10px;
+    background: white;
+
+    &:hover {
+      background-color:  #d0caca;
+    }
+  }
+}

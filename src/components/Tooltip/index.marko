@@ -1,0 +1,10 @@
+<div style=component.input.style class=["cb__tooltipContainer", Array.isArray(component.input.text) && "cb__tooltipContainer--list"]>
+    <if(Array.isArray(component.input.text))>
+      <for|sub, index| of=component.input.text>
+         <label.cb__tooltipContainer__item>${sub.name}</label>
+      </for>
+    </if>
+    <else>
+       <label>${component.input.text}</label>
+    </else>
+</div>

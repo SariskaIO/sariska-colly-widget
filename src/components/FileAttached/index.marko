@@ -1,0 +1,49 @@
+import document from "../Icons/document.marko";
+import close from "../Icons/close.marko";
+import { formatBytes } from "../../utils";
+
+class {
+   onCreate(input) {
+      this.state = {
+         id: input.fileData.id,
+         type: input.fileData.type,
+         size: input.fileData.size,
+         name: input.fileData.name,
+         status: input.fileData.status,
+         url: ""
+      }
+      this.removeAttachment = input.removeAttachment;
+  }
+
+  onInput(input) {
+     this.state.status = input.fileData.status;
+     this.state.url = input.fileData.url;
+  }
+
+  onClick() {
+     this.removeAttachment(this.state.id);
+  }
+
+}
+
+<div.cb__attached>
+   <if(state.type === "photos")>
+      <div.cb__attached__thumbnail><img src=state.url /></div>
+   </if>
+   <else>
+      <div.cb__attached__thumbnail><${document}/></div>
+   </else>
+   <div.cb__attached__filename>
+      <div>${state.name}&nbsp;&nbsp;${formatBytes(state.size)}</div>
+      <if(state.status === "done")>
+         <div.cb__attached__fileAttached>Attached</div>
+      </if>
+      <else-if(state.status === "failed")>
+        <div>Failed</div>
+      </else-if>
+      <else-if(state.status === "loading")>
+        <div.cb__attached__uploading>Uploading...</div>
+      </else-if>
+   </div>
+   <div.cb__attached__close onClick("onClick") ><${close}/></div>
+</div>

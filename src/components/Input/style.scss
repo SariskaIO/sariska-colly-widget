@@ -1,0 +1,41 @@
+@use "@material/textfield/mdc-text-field";
+@use "@material/elevation/mdc-elevation";
+
+.cb__inputContainer {
+  border-radius: 30px;
+  margin-bottom: 0;
+
+  &__input {
+    background: white!important;
+    font-family: Roboto, sans-serif !important;
+    color: red;
+    padding: 8px 16px 6px !important;
+    border: 0 !important;
+    font-size: 14px !important;
+    margin: 0 !important;
+    height: inherit !important;
+    box-shadow: none !important;
+    caret-color: rgb(81, 93, 107)!important;
+  }
+
+  &--hidden {
+    display: none;
+  }
+
+  &__placeholder {
+    left: 16px !important;
+    font-size: 14px !important;
+  }
+
+  &--overlay {
+    font-size: 14px;
+    width: 100%;
+    border-radius: 0;
+
+    label {
+      border: 0 !important;
+      outline: 0 !important;
+      font-size: 14px !important;
+    }
+  }
+}

@@ -1,0 +1,19 @@
+class {
+  onCreate(input) {
+     this.state = {
+       enabled: true
+     }
+  }
+  onClick(key) {
+      this.state.enabled = !this.state.enabled;
+      this.input.onSwitchClick(key, this.state.enabled);
+  }
+}
+<div onClick("onClick", component.input.controlType) class=["mdc-switch", "cb__toggleSwitch", state.enabled && "mdc-switch--checked"]>
+  <div class=["mdc-switch__track", "cb__toggleSwitch__track", state.enabled  && "cb__toggleSwitch__track--enabled"]></div>
+  <div class="mdc-switch__thumb-underlay cb__toggleSwitch__underlay">
+    <div class=["mdc-switch__thumb", "cb__toggleSwitch__thumb",  state.enabled && "cb__toggleSwitch__thumb--enabled"]>
+        <input type="checkbox" id="basic-switch" class="mdc-switch__native-control" role="switch">
+    </div>
+  </div>
+</div>

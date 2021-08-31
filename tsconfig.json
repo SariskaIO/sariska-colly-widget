@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "es5",
+    "noImplicitAny": false,
+    "preserveConstEnums": true,
+    "sourceMap": true,
+    "outDir": "dist",
+    "allowJs": true,
+    "lib": [
+      "es2015",
+      "dom",
+      "dom.iterable"
+    ],
+    "types": [
+      "dom-inputevent"
+    ],
+    "plugins": [{ "name": "typescript-plugin-css-modules" }]
+  },
+  "include": [
+    "lib/index.ts",
+    "lib/types.ts",
+    "/Users/brajendra/phoenix-deployment/sariska_frontend/lib/utils/index.ts",
+    "node_modules/@types/node/base.d.ts"
+  ],
+  "exclude": []
+}

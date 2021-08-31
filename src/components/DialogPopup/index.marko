@@ -1,0 +1,92 @@
+import { CANCEL_POPUP,  JOIN_SESSION } from "../../constants";
+import videocam from "../Icons/videocam.marko";
+import videocam_off from "../Icons/videocam_off.marko";
+import mic from "../Icons/mic.marko";
+import mic_off from "../Icons/mic_off.marko";
+
+class {
+  onCreate(input) {
+     this.state = {
+         audio: true,
+         video: true
+     }
+     this.userSelectedMediaOptions = input.userSelectedMediaOptions;
+     this.dialogBoxAction = input.dialogBoxAction;
+     this.userSelectedMediaOptions({audioEnabled: this.state.audio, videoEnabled: this.state.video});
+  }
+
+  onSwitchClick(key, value) {
+     this.state[key] = value;
+     this.userSelectedMediaOptions({audioEnabled: this.state.audio, videoEnabled: this.state.video});
+  }
+
+  joinSession() {
+     this.dialogBoxAction(JOIN_SESSION);
+  }
+
+}
+
+<div class="cb__dialogPopup mdc-dialog" aria-modal="true" aria-labelledby="my-dialog-title" aria-describedby="my-dialog-content">
+  <div class="mdc-dialog__container cb__dialogPopup__container">
+    <div class="mdc-dialog__surface cb__dialogPopup__surface">
+      <h2 class="mdc-dialog__title cb__dialogPopup__title" id="my-dialog-title"><b>${ component.input.guestName.charAt(0).toUpperCase() + component.input.guestName.slice(1)}</b> has invited you to join collaborative session ?</h2>
+      <div class="mdc-dialog__content cb__dialogPopup__content" id="my-dialog-content">
+          <div class="cb__dialogPopup__controls">
+              <div class="cb__dialogPopup__iconLeft">
+                 <div class="material-icons mdc-fab__icon">
+                  </div>
+                  <label class="cb__dialogPopup__iconLeftHeading">Allow microphone and camera</label>
+              </div>
+           </div>
+          <div class="cb__dialogPopup__controls">
+              <div class="cb__dialogPopup__iconLeft">
+                 <div class="material-icons mdc-fab__icon">
+                      <if(state.video)>
+                          <span class=["cb__dialogPopup__iconLeft", state.video && "cb__dialogPopup__iconLeft--enabledVideo"]><${videocam}/></span>
+                      </if>
+                      <else>
+                          <span class="cb__dialogPopup__iconLeft"><${videocam_off}/></span>
+                      </else>
+                  </div>
+                  <label class="cb__dialogPopup__iconLeftLabel">Allow Camera</label>
+              </div>
+              <ToggleSwitch controlType="video" onSwitchClick = component.onSwitchClick.bind(component) />
+          </div>
+          <div class="cb__dialogPopup__controls">
+             <div class="cb__dialogPopup__iconLeft">
+               <div class="material-icons mdc-fab__icon">
+                    <if(state.audio)>
+                        <span class=["cb__dialogPopup__iconLeft", state.audio && "cb__dialogPopup__iconLeft--enabledAudio"]><${mic}/></span>
+                    </if>
+                    <else>
+                        <span class="cb__dialogPopup__iconLeft"><${mic_off}/></span>
+                    </else>
+                </div>
+                <label class="cb__dialogPopup__iconLeftLabel">Allow Microphone</label>
+             </div>
+             <ToggleSwitch controlType="audio" onSwitchClick = component.onSwitchClick.bind(component) />
+          </div>
+        <hr>
+        <div class="cb__dialogPopup__controls">
+              <div class="cb__dialogPopup__iconLeft">
+                 <div class="material-icons mdc-fab__icon">
+                  </div>
+                  <label class="cb__dialogPopup__iconLeftHeading">Name</label>
+              </div>
+        </div>
+        <Input dialog=true widgetState = component.input.widgetState inputBoxAction = component.input.inputBoxAction inputBoxValue = component.input.inputBoxValue>
+      </div>
+      <footer class="mdc-dialog__actions cb__dialogPopup__footer">
+         <button onClick(()=>{ component.input.dialogBoxAction(CANCEL_POPUP)}) class="mdc-button cb__dialogPopup__button cb__dialogPopup__cancel">
+            <div class="mdc-button__ripple"></div>
+            <span class="mdc-button__label">Cancel</span>
+         </button>
+         <button onClick("joinSession") class="mdc-button cb__dialogPopup__button">
+            <div class="mdc-button__ripple"></div>
+            <span class="mdc-button__label">Join</span>
+         </button>
+      </footer>
+    </div>
+  </div>
+  <div class="mdc-dialog__scrim cb__dialogPopup__opacity"></div>
+</div>

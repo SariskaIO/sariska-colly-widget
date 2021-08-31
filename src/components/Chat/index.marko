@@ -1,0 +1,267 @@
+import { getTime,getTimeLocal, getTop, getText, isOnlyEmojis , encodeHTML} from "../../utils";
+import { pageSize, ChannelMesssageEvents } from "../../constants";
+import minimize from "../Icons/minimize.marko";
+import maximize from "../Icons/maximize.marko";
+import arrow_back from "../Icons/arrow_back.marko";
+import close from "../Icons/close.marko";
+import send from  "../Icons/send.marko";
+import {Presence} from "phoenix";
+
+
+class {
+  onCreate(input) {
+      this.offset = pageSize; //as offset already set to 0 on server
+      this.state = {
+         text: "",
+         sessionInfo: input.sessionData,
+         scrolling: false,
+         nameTT: false,
+         isChat: false,
+         minimizeTT: false,
+         closeTT: false,
+         isZoomed: true,
+         minimize: false,
+         usersList: [],
+         messages: [],
+         channel: input.channel,
+         fileAttached: []
+      }
+  }
+
+  sendMessage() {
+     if (this.state.fileAttached.find(item=>item.status==="loading")) {
+        return;
+     }
+     if ( this.state.text ) {
+        this.pushMessage({created_by: this.state.sessionInfo.id, created_by_name: this.state.sessionInfo.name, content: encodeHTML(this.state.text), content_type: !isOnlyEmojis(this.state.text.trim()) ? 'text' : 'emoji' });
+     }
+     if (this.state.fileAttached.length) {
+        this.state.fileAttached.forEach(item=>{
+           if (item.status === "done") {
+              this.pushMessage({created_by: this.state.sessionInfo.id, created_by_name: this.state.sessionInfo.name, content: encodeHTML(item.url), content_type: item.type});
+           }
+        });
+        this.state.fileAttached = [];
+        this.setStateDirty("fileAttached");
+     }
+  }
+
+  pushMessage(payload) {
+      const messages =  this.state.messages;
+      messages.push(payload);
+      this.state.channel.push(ChannelMesssageEvents.PrivateMessage, payload);
+      this.state.text = "";
+      this.scrollToBottom();
+  }
+
+  onUpdate() {
+     if ( this.state.scrolling ) {
+       const current = this.offset/20;
+       const total = this.count/20;
+       if ( current <= total ) {
+          index  = 20;
+       } else {
+          index = this.count % 20;
+       }
+       const target = this.getEl("cb--chat_body").children[index];
+       target.parentNode.scrollTop = target.offsetTop;
+       this.state.scrolling = false;
+     }
+  }
+
+  onBodyScroll() {
+    const pos = this.getEl("cb--chat_body").scrollTop;
+    if ( pos === 0 && (this.offset/20 <  this.count/20)) {
+       this.fetchMore()
+       this.state.scrolling = true;
+    }
+  }
+
+  fetchMore() {
+    this.state.channel.push(ChannelMesssageEvents.ArchivedMessage, {page: {offset: this.offset, size: pageSize}});
+    this.offset = this.offset + pageSize;
+  }
+
+  scrollToBottom(height) {
+     setTimeout(()=>{
+        const chatBody = this.getEl("cb--chat_body");
+        if ( chatBody ) {
+          chatBody.scrollTop = chatBody.scrollHeight;
+        }
+     }, 0);
+  }
+
+  mouseEnter(param) {
+     this.state[param] = true;
+  }
+
+  onInput(input) {
+      if ( input.isChat !== this.state.isChat) {
+          this.scrollToBottom();
+      }
+      this.state.isChat = input.isChat;
+
+      this.state.usersList = input.usersList;
+      this.setStateDirty("usersList");
+      this.state.messages = input.messages;
+      this.setStateDirty("messages");
+      this.scrollToBottom(); 
+  }
+
+  mouseOut(param) {
+     this.state[param] = false;
+  }
+
+
+  keyDown(event) {
+     if (event.which == 13 || event.keyCode == 13) {
+        event.preventDefault();
+        this.sendMessage();
+     }
+  }
+
+  zoomIn() {
+     this.state.isZoomed = !this.state.isZoomed;
+     this.state.minimize = !this.state.minimize
+     this.state.minimizeTT = false;
+     if ( this.state.isZoomed ) {
+        this.scrollToBottom();
+     }
+  }
+
+  getColor(userId) {
+     const item = this.state.usersList.find(item=>item.id == userId);
+     if ( item ) {
+       return item.color;
+     } else {
+       return "black";
+     }
+  }
+
+  onInputValue(event) {
+     this.state.text = event.target.value;
+  }
+
+  closeChat() {
+     this.state.closeTT = false;
+     this.input.closeChat();
+  }
+
+  setEmoji(emoji) {
+     this.state.text = this.state.text + emoji;
+     setTimeout(()=>this.getEl("cb--chat_input").focus(), 0);
+  }
+
+  startFileUpload(fileData) {
+     const index = this.state.fileAttached.findIndex(item=>fileData.id === item.id);
+     if ( index >= 0 ) {
+        const item  = this.state.fileAttached[index];
+        item.status = fileData.status;
+        item.url = fileData.url;
+        this.state.fileAttached[index] = item;
+     } else {
+        this.state.fileAttached.push(fileData);
+     }
+     this.setStateDirty("fileAttached");
+  }
+
+  removeAttachment(id) {
+      this.state.fileAttached = this.state.fileAttached.filter(item=>item.id !== id);
+      this.setStateDirty("fileAttached");
+  }
+
+}
+
+<div id="cb--chat-container" class=["cb__chatWrapper mdc-elevation--z6", component.input.mobile && "cb__chatWrapper--mobile", !state.isZoomed &&  "cb__chatWrapper--collasped"]>
+  <if(component.input.isChat)>
+     <div class=["cb__chatWrapper__header", component.input.mobile && "cb__chatWrapper__header--mobile"]>
+        <div class="cb__chatWrapper__leftControl" onClick( !component.input.mobile && "zoomIn")>
+           <if(component.input.mobile)>
+               <div.cb__chatWrapper__headerIcons onClick("closeChat")>
+                   <div class="cb__chatWrapper__headerBack"><${arrow_back}/></div>
+               </div>
+           </if>
+           <else>
+               <div.cb__chatWrapper__headerIcons>
+                  <for|sub, index| of=state.usersList>
+                     <if(index <= 1)>
+                       <div class=["cb__chatWrapper__headerIcons__"+index, state.usersList.length===1 && "cb__chatWrapper__headerIcons--one"] style={ "background-color": sub.color } >${sub.name[0].toUpperCase()}</div>
+                     </if>
+                  </for>
+                </div>
+           </else>
+           <span.cb__chatWrapper__headerName onMouseOut("mouseOut", "nameTT") onMouseOver("mouseEnter", "nameTT") >
+                <if(state.usersList.length === 1)>
+                    &nbsp;${state.usersList[0].name}
+                </if>
+                <else>
+                  <for|sub, index| of=state.usersList>
+                    ${sub.name} <if( index !== (state.usersList.length-1))>,&nbsp;</if>
+                  </for>
+                </else>
+           </span>
+           <if(state.nameTT)>
+                <Tooltip style={top: getTop(state.usersList), left:"35px"} text=state.usersList />
+           </if>
+           <div.cb__chatWrapper__active>Active now</div>
+        </div>
+        <if(!component.input.mobile)>
+           <div class="cb__chatWrapper__rightControl">
+              <div onClick("zoomIn") class="cb__chatWrapper__zoom material-icons mdc-fab__icon">
+                 <span onMouseOut("mouseOut", "minimizeTT") onMouseOver("mouseEnter", "minimizeTT") class="cb__chatWrapper__mixMaxBtn material-icons" ><${ state.minimize ? maximize : minimize}/></span>
+              </div>
+              <if(state.minimizeTT)>
+                 <Tooltip text = getText(state.isZoomed) style={ top:"-31px", left:"-16px" }  />
+              </if>
+              <div onClick("closeChat")  class="cb__chatWrapper__close material-icons mdc-fab__icon">
+                  <span onMouseOut("mouseOut", "closeTT") onMouseOver("mouseEnter", "closeTT")><${close}/></span>
+              </div>
+              <if(state.closeTT)>
+                 <Tooltip style={top:"-31px", left:"36px" } text="Close" />
+              </if>
+           </div>
+        </if>
+     </div>
+     <if(state.isZoomed)>
+        <div class=["cb__chatWrapper__body", component.input.mobile && "cb__chatWrapper__body--mobile"] onScroll("onBodyScroll") key="cb--chat_body">
+           <for|sub, index| of=state.messages>
+              <if (state.messages[index-1] === undefined  || (state.messages[index-1].created_by !== state.messages[index].created_by))>
+                 <div key=index class=`cb__chatWrapper__name` >
+                    <div style={ "background-color": component.getColor(sub.created_by) } class="cb__chatWrapper__thumbnail">${sub.created_by_name[0].toUpperCase()}</div>
+                    <if(sub.created_by === state.sessionInfo.id)>
+                        <div class="cb__chatWrapper__meta">
+                             <span class="cb__chatWrapper__name">${state.sessionInfo.name}</span>
+                             <span.cb__chatWrapper__time>${getTimeLocal()}</span>
+                        </div>
+                    </if>
+                    <else>
+                        <div class="cb__chatWrapper__meta">
+                             <span class="cb__chatWrapper__name">${sub.created_by_name}</span>
+                             <span.cb__chatWrapper__time>${getTime(sub.inserted_at)}</span>
+                        </div>
+                    </else>
+                 </div>
+              </if>
+              <MessageItem messageItem = state.messages[index] />
+           </for>
+        </div>
+        <if(state.fileAttached.length)>
+            <div.cb__chatWrapper__attachements>
+                <for|sub, index| of=state.fileAttached>
+                   <FileAttached  key=sub.created_by fileData=sub removeAttachment = component.removeAttachment.bind(component) />
+                </for>
+            </div>
+        </if>
+        <div class=["cb__chatWrapper__footer", component.input.mobile && "cb__chatWrapper__footer--mobile"]>
+            <textarea.cb__chatWrapper__textarea key="cb--chat_input" onKeyDown("keyDown") on-input('onInputValue') placeholder="Type a message..." type="text" value = state.text ></textarea>
+            <div.cb__chatWrapper__sendContainer>
+               <div onClick("sendMessage") class="mdc-fab mdc-fab--mini cb__chatWrapper__send">
+                  <div class="mdc-fab__ripple"></div>
+                  <span class="material-icons mdc-fab__icon"><${send}/></span>
+               </div>
+           </div>
+        </div>
+        <MediaPickerChat startFileUpload = component.startFileUpload.bind(component) setEmoji = component.setEmoji.bind(component) sessionInfo = state.sessionInfo />
+     </if>
+  </if>
+</div>

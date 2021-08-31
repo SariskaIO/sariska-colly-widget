@@ -1,0 +1,57 @@
+import SariskaMediaTransport from "sariska-media-transport";
+import {getL} from "../../utils/local-storage";
+import {getToken} from "../../utils";
+
+class {
+   onCreate(input) {
+      this.state = {
+         connection: null
+      }
+
+      console.log("input", input);
+      SariskaMediaTransport.initialize();
+      SariskaMediaTransport.setLogLevel(SariskaMediaTransport.logLevels.ERROR); //TRACE ,DEBUG, INFO, LOG, WARN, ERROR
+      this.updateNetwork = this.updateNetwork.bind(this);
+      window.addEventListener("offline", this.updateNetwork);
+      window.addEventListener("online", this.updateNetwork);
+      this.createConnection(input.token);
+   }
+
+   async createConnection(token) {
+      const conn = new SariskaMediaTransport.JitsiConnection(token);
+      conn.addEventListener(SariskaMediaTransport.events.connection.CONNECTION_ESTABLISHED, onConnectionSuccess.bind(this));
+      conn.addEventListener(SariskaMediaTransport.events.connection.CONNECTION_FAILED, onConnectionFailed.bind(this));
+      conn.addEventListener(SariskaMediaTransport.events.connection.CONNECTION_DISCONNECTED, onConnectionDisconnected.bind(this));
+      conn.connect();
+
+      function onConnectionSuccess() {
+         this.state.connection = conn;
+      }
+
+      function onConnectionDisconnected(error) {
+         if (!this.state.connection) {
+            return;
+         }
+         conn.removeEventListener(SariskaMediaTransport.events.connection.CONNECTION_ESTABLISHED, onConnectionSuccess);
+         conn.removeEventListener(SariskaMediaTransport.events.connection.CONNECTION_FAILED, onConnectionFailed);
+         conn.removeEventListener(SariskaMediaTransport.events.connection.CONNECTION_DISCONNECTED, onConnectionDisconnected);
+      }
+
+      function onConnectionFailed() {
+      
+      }
+   }
+
+   updateNetwork () { //  set internet connectivity status
+     SariskaMediaTransport.setNetworkInfo({isOnline: window.navigator.onLine});
+   }
+
+   onDestroy() {
+      window.removeEventListener("offline", this.updateNetwork);
+      window.removeEventListener("online", this.updateNetwork);
+   }
+}
+
+<if(state.connection)>
+  <Conference onMediaControlChange=component.input.onMediaControlChange muteAll = component.input.muteAll videoEnabled = component.input.videoEnabled  audioEnabled = component.input.audioEnabled  videoWidget=component.input.videoWidget  isPublisher=component.input.isPublisher closeCurrentSession = component.input.closeCurrentSession connection=state.connection />
+</if>

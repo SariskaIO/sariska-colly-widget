@@ -1,0 +1,40 @@
+import { INVITE_PEOPLE, IS_CHAT, REPORT_PROBLEM, SYNC_WITH_CURRENT_URL } from "../../constants";
+import person_add from "../Icons/person_add.marko";
+import call_end from "../Icons/call_end.marko";
+import chat from "../Icons/chat.marko";
+import videocam from "../Icons/videocam";
+import videocam_off from  "../Icons/videocam_off";
+import report_problem from  "../Icons/report_problem";
+import sync from  "../Icons/sync.marko";
+
+class {
+  invitePeople(event) {
+     this.input.secondaryButtonAction(INVITE_PEOPLE);
+  }
+}
+
+<div class=["cb__widgetControls", component.input.isWidgetHidden && "cb__widgetControls--hidden"]>
+   <if(!component.input.loading)>
+     <div class="cb__widgetControls__menu">
+       <label class="mdc-elevation--z6 mdc-typography">Invite People</label>
+       <div onClick("invitePeople") class="mdc-fab mdc-fab--mini cb__widgetControls__button">
+          <div class="mdc-fab__ripple"></div>
+          <span class="material-icons mdc-fab__icon"><${person_add}/></span>
+       </div>
+     </div>
+     <div class="cb__widgetControls__menu">
+       <label  class="mdc-elevation--z6 mdc-typography">Chat</label>
+       <div onClick(()=>{ component.input.secondaryButtonAction(IS_CHAT)}) class="mdc-fab mdc-fab--mini cb__widgetControls__button">
+           <div class="mdc-fab__ripple"></div>
+           <span class="material-icons mdc-fab__icon"><${chat}/></span>
+       </div>
+     </div>
+     <div class="cb__widgetControls__menu">
+        <label  class="mdc-elevation--z6 mdc-typography">Help & feedback</label>
+        <div  onClick(()=>{ component.input.secondaryButtonAction(REPORT_PROBLEM)}) class="mdc-fab mdc-fab--mini cb__widgetControls__button">
+           <div class="mdc-fab__ripple"></div>
+           <span class="material-icons mdc-fab__icon"><${report_problem}/></span>
+        </div>
+     </div>
+   </if>
+</div>
