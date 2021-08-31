@@ -91,7 +91,7 @@ class  {
             break;
           case VOLUME_TOGGLE:
              this.state.conference.getParticipants().forEach(participant=>{
-                 this.state.room.muteParticipant(participant.getJid(), value);
+                 this.state.conference.muteParticipant(participant.getJid(), value);
              });
              break;
           case RECORDING_TOGGLE:
@@ -131,8 +131,8 @@ class  {
    }
 
    leaveConference(event) {
-      if ( this.state.room && this.state.room.isJoined() ) {
-         this.state.room.leave().then(() => this.input.connection.disconnect(event));
+      if ( this.state.conference && this.state.conference.isJoined() ) {
+         this.state.conference.leave().then(() => this.input.connection.disconnect(event));
       }
       this.state.localTracks.forEach(item => item.dispose())
    }
