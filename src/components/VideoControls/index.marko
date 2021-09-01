@@ -1,4 +1,4 @@
-import { VOLUME_TOGGLE, VIDEO_TOGGLE, WIDGET_TOGGLE, CALL_END, TOGGLE_RECORDING } from "../../constants";
+import { MUTE_ALL_TOGGLE, VIDEO_TOGGLE, WIDGET_TOGGLE, CALL_END, TOGGLE_RECORDING } from "../../constants";
 import volume_up from "../Icons/volume_up.marko";
 import volume_off from "../Icons/volume_off.marko";
 import videocam from "../Icons/videocam.marko";
@@ -54,7 +54,7 @@ class {
         </if>
     </div>
 
-    <div class="cb__videoControls__icon" onClick("onClick", VOLUME_TOGGLE, component.input.muteAll)  onMouseOut("mouseOut", "volumeTT") onMouseEnter("mouseEnter", "volumeTT")>
+    <div class="cb__videoControls__icon" onClick("onClick", MUTE_ALL_TOGGLE, component.input.muteAll)  onMouseOut("mouseOut", "volumeTT") onMouseEnter("mouseEnter", "volumeTT")>
         <div class="material-icons mdc-fab__icon">
             <if(component.input.muteAll)>
                  <${volume_off}/>

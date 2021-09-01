@@ -21,7 +21,7 @@ module.exports = {
         publicPath: 'http://localhost:8081/'
     },
     plugins: [
-        new BundleAnalyzerPlugin(),
+        //new BundleAnalyzerPlugin(),
         new MiniCssExtractPlugin({
             filename: '[name].colly.widget.[contenthash].css'
         }),
@@ -30,15 +30,13 @@ module.exports = {
         }),
         new CleanWebpackPlugin(),
         {
-            apply: (compiler) => {
+            apply: (compiler) => { // replace style file from javascript bundle
                   if ( process.env.NODE_ENV === "production"  ) {
                       compiler.hooks.afterEmit.tap('AfterEmitPlugin', (compilation) => {
                           let fileContent  = fs.readFileSync("dist/main.colly.widget.js", "utf-8");
                           const startIndex = fileContent.indexOf("https://sdk.sariska.io/main.colly.widget");
                           const endIndex = startIndex + 65;
                           const selectedContent  = fileContent.slice(startIndex, endIndex);
-
-                          console.log("selectedContent", selectedContent);
                           const distDir = fs.readdirSync("dist");
                           const cssFile = distDir.find(item=>item.indexOf(".css") >=0);
                           fileContent = fileContent.replace(selectedContent, `https://sdk.sariska.io/${cssFile}`);

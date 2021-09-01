@@ -1,5 +1,5 @@
 import SariskaMediaTransport from "sariska-media-transport";
-import { VOLUME_TOGGLE, VIDEO_TOGGLE, WIDGET_TOGGLE, CALL_END, MIC_TOGGLE, RECORDING_TOGGLE } from "../../constants";
+import { MUTE_ALL_TOGGLE, VIDEO_TOGGLE, WIDGET_TOGGLE, CALL_END, MIC_TOGGLE, RECORDING_TOGGLE } from "../../constants";
 import { getDimensions } from  "../../utils";
 import "./index.scss";
 
@@ -89,7 +89,7 @@ class  {
                 }
             });
             break;
-          case VOLUME_TOGGLE:
+          case MUTE_ALL_TOGGLE:
              this.state.conference.getParticipants().forEach(participant=>{
                  this.state.conference.muteParticipant(participant.getJid(), value);
              });
