@@ -1,6 +1,3 @@
-import {SECRET_SALT} from "../constants";
-import {cipher, decipher} from "../utils";
-
 let isSupported = true;
 
 try {

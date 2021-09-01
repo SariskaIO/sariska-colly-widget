@@ -7,8 +7,6 @@ class {
       this.state = {
          connection: null
       }
-
-      console.log("input", input);
       SariskaMediaTransport.initialize();
       SariskaMediaTransport.setLogLevel(SariskaMediaTransport.logLevels.ERROR); //TRACE ,DEBUG, INFO, LOG, WARN, ERROR
       this.updateNetwork = this.updateNetwork.bind(this);
@@ -38,7 +36,7 @@ class {
       }
 
       function onConnectionFailed() {
-      
+
       }
    }
 

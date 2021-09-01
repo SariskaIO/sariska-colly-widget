@@ -21,7 +21,7 @@ module.exports = {
         publicPath: 'http://localhost:8081/'
     },
     plugins: [
-        //new BundleAnalyzerPlugin(),
+        new BundleAnalyzerPlugin(),
         new MiniCssExtractPlugin({
             filename: '[name].colly.widget.[contenthash].css'
         }),

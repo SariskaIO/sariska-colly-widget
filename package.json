@@ -69,8 +69,6 @@
   },
   "keywords": [],
   "dependencies": {
-    "@cliqz/adblocker": "^1.19.0",
-    "@cliqz/adblocker-webextension": "^1.19.0",
     "@joeattardi/emoji-button": "https://github.com/brajendrak00068/emoji-button",
     "@material/animation": "^5.1.0",
     "@material/base": "^5.1.0",
@@ -87,14 +85,8 @@
     "aws-s3": "^2.0.5",
     "babel-polyfill": "^6.26.0",
     "compressorjs": "^1.0.6",
-    "diff-match-patch": "^1.0.5",
-    "flatbuffers": "^1.11.0",
-    "global": "^4.4.0",
-    "install": "^0.13.0",
     "marko": "^4.18.34",
     "node-sass": "^4.13.1",
-    "npm": "^6.13.7",
-    "rxjs": "6.5.4",
     "sariska-media-transport": "git+https://github.com/SariskaIO/sariska-media-transport.git"
   },
   "directories": {
