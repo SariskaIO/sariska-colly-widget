@@ -35,6 +35,7 @@ class {
              messages:[],
              isMouseDown: false,
              name: '',
+             iAmRecorder: window.location.hash.indexOf("iAmRecorder") >= 0,
              widgetInitialized: false,
              newChatMessage: false,
              toast: false,
@@ -63,6 +64,18 @@ class {
         document.addEventListener("mouseup", this.mouseUp.bind(this), false);
         document.addEventListener("click", this.documentClick, false);
         this.mouseMoveRef = this.mouseMove.bind(this);
+
+        const startRecorder = async ()=> {
+            this.state.sessionData.session_id = window.location.pathname.substring(1);
+            const token = await getToken(this.state.sessionData);
+            this.state.token = token;
+            this.state.widgetInitialized = true;
+            this.state.isMedia = true;
+        }
+
+        if (this.state.iAmRecorder) {
+           startRecorder();
+        }
       }
 
       documentKeyDown(event) {

@@ -22,6 +22,25 @@ class  {
       conference.on(SariskaMediaTransport.events.conference.TRACK_ADDED, removeTrackAdded.bind(this));
       conference.on(SariskaMediaTransport.events.conference.TRACK_REMOVED, remoteTrackRemoved.bind(this));
       conference.on(SariskaMediaTransport.events.conference.TRACK_MUTE_CHANGED, onTrackMuteChanged.bind(this));
+      conference.on(SariskaMediaTransport.events.conference.CONFERENCE_JOINED, ()=>{
+        conference.getParticipants().forEach(item=>{
+            if (item._properties && item._properties.hasOwnProperty("recording")) {
+                this.state.recordingEnabled = true;
+            }
+        });
+      });
+      conference.on(SariskaMediaTransport.events.conference.RECORDER_STATE_CHANGED, (data) => {
+            if (data._status === "on" && data._mode === "file") {
+                this.state.recordingEnabled = true;
+                input.showToast("Recording Started");
+            }
+
+            if (data._status === "off" && data._mode === "file") {
+                this.state.recordingEnabled = false;
+                input.showToast("Recording Stopped");
+            }
+      });
+
       conference.join();
       this.state.conference = conference;
 
@@ -106,10 +125,10 @@ class  {
                       appData: JSON.stringify(appData)
                   });
                   this.state.recordingSession = session;
-                  this.state.recordingEnabled = true;
+                  this.state.conference.setLocalParticipantProperty("recording");
               } else {
                   await this.state.conference.stopRecording(this.state.recordingSession._sessionID);
-                  this.state.recordingEnabled = false;
+                  this.state.conference.removeLocalParticipantProperty("recording");
                   this.state.recordingSession = null;
               }
               break;

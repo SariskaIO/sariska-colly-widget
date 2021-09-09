@@ -26,6 +26,12 @@
     }
   }
 
+  &__recordingEnabled {
+    svg {
+      fill: red;
+    }
+  }
+
   &__icon:hover {
     background: #d0caca;
   }
