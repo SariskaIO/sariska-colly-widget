@@ -10,6 +10,7 @@ if (1  || BUILD_ENV === "production") {
     GENERATE_TOKEN_URL_ENV = "https://api.sariska.io/api/v1/misc/generate-token";
 }
 
+export const RECORDING_TOGGLE = "RECORDING_TOGGLE";
 export const GET_PRESIGNED_URL = GET_PRESIGNED_URL_ENV;
 export const GENERATE_TOKEN_URL = GENERATE_TOKEN_URL_ENV;
 export const MESSAGING_SERVICE_WEBSOCKET = MESSAGING_SERVICE_URL;
@@ -34,7 +35,6 @@ export const JOIN_SESSION = "JOIN_SESSION";
 export const MUTE_ALL_TOGGLE = "muteAll";
 export const VIDEO_TOGGLE = "videoEnabled";
 export const WIDGET_TOGGLE = "videoWidget";
-export const RECORDING_TOGGLE = "RECORDING_TOGGLE";
 export const MIC_TOGGLE = "audioEnabled";
 export const CALL_END = "CALL_END";
 export const WIDGET_ACTION = "WIDGET_ACTION";

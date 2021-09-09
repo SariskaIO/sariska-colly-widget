@@ -23,6 +23,7 @@ class {
           fileName: file.name,
           fileType: file.type
       }
+
       this.startFileUpload({id, name: file.name, type: this.state.type, size: file.size, status: 'loading'});
       Promise.all([
          getPresignedUrl(signedUrlOptions),

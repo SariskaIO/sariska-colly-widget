@@ -1,4 +1,4 @@
-import { MUTE_ALL_TOGGLE, VIDEO_TOGGLE, WIDGET_TOGGLE, CALL_END, TOGGLE_RECORDING } from "../../constants";
+import { MUTE_ALL_TOGGLE, VIDEO_TOGGLE, WIDGET_TOGGLE, CALL_END, RECORDING_TOGGLE } from "../../constants";
 import volume_up from "../Icons/volume_up.marko";
 import volume_off from "../Icons/volume_off.marko";
 import videocam from "../Icons/videocam.marko";
@@ -40,7 +40,7 @@ class {
 }
 
 <div class="cb__videoControls mdc-elevation--z6">
-    <div class="cb__videoControls__icon" onClick("onClick", TOGGLE_RECORDING, component.input.recordingEnabled)  onMouseOut("mouseOut", "recordingTT") onMouseEnter("mouseEnter", "recordingTT")>
+    <div class="cb__videoControls__icon" onClick("onClick", RECORDING_TOGGLE, component.input.recordingEnabled)  onMouseOut("mouseOut", "recordingTT") onMouseEnter("mouseEnter", "recordingTT")>
         <div class="material-icons mdc-fab__icon">
             <if(component.input.muteAll)>
                  <${recording_on}/>

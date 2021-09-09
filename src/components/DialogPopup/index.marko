@@ -5,14 +5,15 @@ import mic from "../Icons/mic.marko";
 import mic_off from "../Icons/mic_off.marko";
 
 class {
-  onCreate(input) {
-     this.state = {
+
+   onCreate(input) {
+      this.state = {
          audio: true,
          video: true
-     }
-     this.userSelectedMediaOptions = input.userSelectedMediaOptions;
-     this.dialogBoxAction = input.dialogBoxAction;
-     this.userSelectedMediaOptions({audioEnabled: this.state.audio, videoEnabled: this.state.video});
+      }
+      this.userSelectedMediaOptions = input.userSelectedMediaOptions;
+      this.dialogBoxAction = input.dialogBoxAction;
+      this.userSelectedMediaOptions({audioEnabled: this.state.audio, videoEnabled: this.state.video});
   }
 
   onSwitchClick(key, value) {

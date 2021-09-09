@@ -394,7 +394,8 @@ export async function getToken(sessionParams):Promise<string> {
                 id: sessionParams.id,
                 name: sessionParams.name,
                 email: sessionParams.email,
-                avatar: sessionParams.avatar
+                avatar: sessionParams.avatar,
+                role: sessionParams.role
             },
             sessionId: sessionParams.session_id,
             apiKey: "27fd6f8080d512442a3694f461adb3986cda5ba39dbe368d75" //window["sariskaConfig"] pick from here

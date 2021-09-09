@@ -135,7 +135,13 @@ class {
          }
          this.state.loading = true;
          this.state.sessionData.session_id = this.state.sessionData.session_id ? this.state.sessionData.session_id : getMeetingId();
+         
+         if (!getQueryStringValue("cbid",window.location)) {
+            this.state.sessionData.role = true;
+         }
+
          const token = await getToken(this.state.sessionData);
+
          if (!token) {
              console.log("no token");
          }
@@ -167,7 +173,7 @@ class {
 
          this.state.channel = channel;
 
-         channel.on("user_joined",  (payload)=> {
+         this.state.channel.on("user_joined",  (payload)=> {
              const {user, room} = payload;
              document.removeEventListener("click", this.documentClick, false);
              this.state.loading  = false;
@@ -198,27 +204,26 @@ class {
               this.setStateDirty("messages");
          });
 
-          let presence = new Presence(channel);
+         let presence = new Presence(this.state.channel);
 
-           presence.onJoin((id, current, newPres) => {
-                const user = this.state.usersList.find(item=>item.id === id);
-                if (!user) {
-                    this.state.usersList.push({...newPres.metas[0], id: id, color: getRandomColor()});
-                }
-                this.setStateDirty("usersList");
-                if ( id === this.state.sessionData.id ) {
-                    this.showToast("Connected");
-                } else {
-                    this.showToast(`${newPres.metas[0].name} has joined`);
-                }
-            });
+         presence.onJoin((id, current, newPres) => {
+             const user = this.state.usersList.find(item=>item.id === id);
+             if (!user) {
+                 this.state.usersList.push({...newPres.metas[0], id: id, color: getRandomColor()});
+             }
+             this.setStateDirty("usersList");
+             if ( id === this.state.sessionData.id ) {
+                 this.showToast("Connected");
+             } else {
+                 this.showToast(`${newPres.metas[0].name} has joined`);
+             }
+         });
 
-            presence.onLeave((id, current, leftPres) => {
-                this.state.usersList = this.state.usersList.filter(item=>item.id !== id);
-                this.setStateDirty("usersList");
-                this.showToast(`${leftPres.metas[0].name} has left`);
-            })
-
+         presence.onLeave((id, current, leftPres) => {
+             this.state.usersList = this.state.usersList.filter(item=>item.id !== id);
+             this.setStateDirty("usersList");
+             this.showToast(`${leftPres.metas[0].name} has left`);
+         })
       }
 
     primaryButtonAction(action) {
@@ -379,7 +384,6 @@ class {
          window.removeEventListener("beforeunload", this.beforeReload);
          document.removeEventListener("keydown", this.documentKeyDown);
       }
-
   }
 
 <div key="uiWidget" onMouseUp("mouseUp") onMouseDown("mouseDown") class=["cb__uiWidget", state.isMouseDown && "cb__uiWidget--move", state.widgetState === Constants.PRIMARY_BUTTON_WITH_INPUT && "cb__uiWidget--flexColumn"]>
