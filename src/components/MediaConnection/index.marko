@@ -51,5 +51,17 @@ class {
 }
 
 <if(state.connection)>
-  <Conference showToast = component.input.showToast onMediaControlChange=component.input.onMediaControlChange muteAll = component.input.muteAll videoEnabled = component.input.videoEnabled  audioEnabled = component.input.audioEnabled  videoWidget=component.input.videoWidget  isPublisher=component.input.isPublisher closeCurrentSession = component.input.closeCurrentSession connection=state.connection />
+  <Conference 
+        tracksInitialized = component.input.tracksInitialized
+        conferenceInitialized = component.input.conferenceInitialized
+        showToast = component.input.showToast 
+        onMediaControlChange=component.input.onMediaControlChange 
+        muteAll = component.input.muteAll 
+        videoEnabled = component.input.videoEnabled  
+        audioEnabled = component.input.audioEnabled  
+        videoWidget=component.input.videoWidget  
+        isPublisher=component.input.isPublisher 
+        closeCurrentSession = component.input.closeCurrentSession 
+        connection=state.connection
+   />
 </if>

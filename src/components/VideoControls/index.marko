@@ -40,20 +40,6 @@ class {
 }
 
 <div class="cb__videoControls mdc-elevation--z6">
-    <div class="cb__videoControls__icon" onClick("onClick", RECORDING_TOGGLE, component.input.recordingEnabled)  onMouseOut("mouseOut", "recordingTT") onMouseEnter("mouseEnter", "recordingTT")>
-        <div class=["material-icons mdc-fab__icon", component.input.recordingEnabled && "cb__videoControls__recordingEnabled"]>
-            <if(component.input.recordingEnabled)>
-                 <${recording_on}/>
-            </if>
-            <else>
-               <${recording_off}/>
-            </else>
-        </div>
-        <if(state.recordingTT)>
-           <Tooltip style={top:"-33px", left: 0},  text = component.input.recordingEnabled  ? "Stop Recording" : "Start Recording" />
-        </if>
-    </div>
-
     <div class="cb__videoControls__icon" onClick("onClick", MUTE_ALL_TOGGLE, component.input.muteAll)  onMouseOut("mouseOut", "volumeTT") onMouseEnter("mouseEnter", "volumeTT")>
         <div class="material-icons mdc-fab__icon">
             <if(component.input.muteAll)>

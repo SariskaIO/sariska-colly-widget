@@ -207,12 +207,18 @@ export function getRandomColor() {
 }
 
 export function syncWithParams(params) {
-    const sessionId =  getQueryStringValue("cbid",window.location);
-    const guestName =  getQueryStringValue("guestname",window.location);
+
+    const urlParams = window.location.pathname.split("/");
+
+    const sessionId =  urlParams[2];
+
+    const guestName =  urlParams[3];
+
     if (sessionId) {
-        params["guestName"] = guestName;
+        params["name"] = guestName;
         params["session_id"] = sessionId;
     }
+
     return params;
 }
 
@@ -395,7 +401,7 @@ export async function getToken(sessionParams):Promise<string> {
                 name: sessionParams.name,
                 email: sessionParams.email,
                 avatar: sessionParams.avatar,
-                role: sessionParams.role
+                moderator: sessionParams.moderator
             },
             sessionId: sessionParams.session_id,
             apiKey: "27fd6f8080d512442a3694f461adb3986cda5ba39dbe368d75" //window["sariskaConfig"] pick from here

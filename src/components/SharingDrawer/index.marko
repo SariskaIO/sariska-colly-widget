@@ -33,20 +33,12 @@ class {
   }
 
   copyURL(sessionData) {
-  console.log("sessionData", sessionData);
      const element  =  this.el.querySelector('#cb__clipboard');
-     let url  =  updateQueryStringParameter(window.location.href, "cbid", sessionData.session_id);
-
-     console.log("url", url);
-
-         url  =  updateQueryStringParameter(url, "guestname", sessionData.name);
-
-         console.log("url", url);
+     let url  = window.location.href;
      element.setAttribute("value", url);
      element.select();
      document.execCommand('copy');
      this.startTooltip();
-     this.startMedia();
   }
 
   startMedia() {

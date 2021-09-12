@@ -1,3 +1,4 @@
+import SariskaMediaTransport from "sariska-media-transport";
 import { getQueryStringValue,
     syncWithParams,
     syncMediaOptionsLocalStorage,
@@ -29,8 +30,14 @@ class {
              widgetState: Constants.PRIMARY_BUTTON,
              isChat: persistedData.isChat,
              loading: false,
+             recordingSession: null,
              sessionData,
              coordinateShift:{},
+             desktopTrack: null,
+             recording: false,
+             conference: null,
+             screenSharing: false,
+             localTracks: [],
              usersList: [],
              messages:[],
              isMouseDown: false,
@@ -50,13 +57,10 @@ class {
              videoWidget: persistedData.videoWidget===undefined ? true : persistedData.videoWidget,
         }
 
-         if (getQueryStringValue("cbid",window.location)) {
-           this.state.widgetState = Constants.INPUT_WITH_OVERLAY;
-         } else if ( this.state.isDisconnected ) {
-            this.state.widgetState = Constants.PRIMARY_BUTTON;
-         } else {
+        if (sessionData.name && sessionData.session_id) {
+           console.log("sesssion joined"); 
            this.joinSession();
-         }
+        }
 
         this.documentClick = this.documentClick.bind(this);
         window.addEventListener("beforeunload", this.beforeReload.bind(this));
@@ -66,11 +70,15 @@ class {
         this.mouseMoveRef = this.mouseMove.bind(this);
 
         const startRecorder = async ()=> {
-            this.state.sessionData.session_id = window.location.pathname.substring(1);
+          try  {
+            const urlParams = window.location.pathname.split("/");
+            const sessionId =  urlParams[2];
+            this.state.sessionData.session_id = sessionId;
             const token = await getToken(this.state.sessionData);
             this.state.token = token;
             this.state.widgetInitialized = true;
             this.state.isMedia = true;
+          } catch(e) {}
         }
 
         if (this.state.iAmRecorder) {
@@ -147,14 +155,11 @@ class {
             return;
          }
          this.state.loading = true;
-         this.state.sessionData.session_id = this.state.sessionData.session_id ? this.state.sessionData.session_id : getMeetingId();
-         
-         if (!getQueryStringValue("cbid",window.location)) {
-            this.state.sessionData.role = true;
-         }
-
+         const urlParams = window.location.pathname.split("/");
+         const sessionId =  urlParams[2];
+         this.state.sessionData.session_id = sessionId;
+         this.state.sessionData.moderator = true;
          const token = await getToken(this.state.sessionData);
-
          if (!token) {
              console.log("no token");
          }
@@ -200,6 +205,7 @@ class {
              this.state.widgetState = Constants.PRIMARY_BUTTON_WITH_WIDGET_OPEN;
              this.state.widgetInitialized = true;
              this.showToast("Connected");
+             this.state.isMedia = true;
          });
 
          this.state.channel.on(ChannelMesssageEvents.PrivateMessage,  (payload)=> {
@@ -225,18 +231,12 @@ class {
                  this.state.usersList.push({...newPres.metas[0], id: id, color: getRandomColor()});
              }
              this.setStateDirty("usersList");
-             if ( id === this.state.sessionData.id ) {
-                 this.showToast("Connected");
-             } else {
-                 this.showToast(`${newPres.metas[0].name} has joined`);
-             }
          });
 
          presence.onLeave((id, current, leftPres) => {
              this.state.usersList = this.state.usersList.filter(item=>item.id !== id);
              this.setStateDirty("usersList");
-             this.showToast(`${leftPres.metas[0].name} has left`);
-         })
+         });
       }
 
     primaryButtonAction(action) {
@@ -315,15 +315,22 @@ class {
               this.state.unreadMessage = false;
               this.state[action] = true;
               break;
-           case Constants.IS_MEDIA:
-              this.state[action] = true;
-              break;
-           case Constants.REPORT_PROBLEM:
-              this.state.widgetState = Constants.REPORT_PROBLEM;
-              break;
            case Constants.INVITE_PEOPLE:
               this.state.widgetState = Constants.INVITE_PEOPLE;
               break;
+           case Constants.IS_SCREEN_SHARING:
+              if ( !this.state.screenSharing ) {
+                   this.startScreenSharing();
+              } else { 
+                   this.stopScreenSharing();
+              }
+              break;
+           case Constants.IS_REOCRDING:
+              if ( !this.state.recording ) {
+                   this.startRecording();
+              } else { 
+                   this.stopRecording();
+              }
          }
       }
 
@@ -377,7 +384,92 @@ class {
       }
 
 
-      beforeReload() {
+      conferenceInitialized(conference) {
+          this.state.conference = conference;
+          conference.on(SariskaMediaTransport.events.conference.RECORDER_STATE_CHANGED, (data) => {
+                console.log("data", data);
+                if (data._status === "on" && data._mode === "file") {
+                    this.showToast("Recording Started");
+                    this.state.recording = true;
+                }
+                if (data._status === "off" && data._mode === "file") {
+                    this.showToast("Recording Stopped");
+                    this.state.recording = false;
+                }
+          });
+      }
+
+      tracksInitialized(localTracks) {
+           this.state.localTracks = localTracks;
+      }
+
+      async startRecording() {
+            const appData = {
+                file_recording_metadata : {
+                   'share': true
+                }
+            };
+            const session = await this.state.conference.startRecording({
+                mode: SariskaMediaTransport.constants.recording.mode.FILE,
+                appData: JSON.stringify(appData)
+            });
+            this.state.recordingSession = session;
+            this.state.conference.setLocalParticipantProperty("recording");
+       }
+
+       async stopRecording() {
+          if (!this.state.recordingSession) {
+             return;
+          }
+          await this.state.conference.stopRecording(this.state.recordingSession._sessionID);
+          this.state.conference.removeLocalParticipantProperty("recording");
+          this.state.recordingSession = null;
+       }
+
+       async startScreenSharing() {
+            if (this.state.desktopTrack)  {
+                return;
+            }
+            const videoTrack = this.state.localTracks.find(track => track.videoType === "camera");
+            const [desktopTrack] = await SariskaMediaTransport.createLocalTracks({
+                resolution: 720,
+                devices: ["desktop"],
+                desktopSharingFrameRate: {
+                    min: 40,
+                    max: 60
+                },
+                constraints: {
+                    video: {
+                         height: {
+                             ideal: 720,
+                             max: 720,
+                             min: 720
+                         }
+                     }
+                 }
+            });
+
+            this.state.conference.replaceTrack(videoTrack, desktopTrack);
+            desktopTrack.addEventListener(SariskaMediaTransport.events.track.LOCAL_TRACK_STOPPED, async () => {
+                this.stopScreenSharing();
+            });
+            this.state.conference.setLocalParticipantProperty("presenting", "start");
+            this.state.desktopTrack = desktopTrack;
+            this.state.screenSharing = true;
+       }
+
+       async stopScreenSharing() {
+            if (!this.state.desktopTrack)  {
+                return;
+            }
+            const videoTrack = this.state.localTracks.find(track => track.videoType === "camera");
+            await this.state.conference.replaceTrack(this.state.desktopTrack, videoTrack);
+            this.state.conference.setLocalParticipantProperty("presenting", "stop");
+            this.state.desktopTrack = null;
+            this.state.screenSharing = false;
+       }
+
+       beforeReload() {
          const data =  {
             sessionData: this.state.sessionData,
             isPublisher: this.state.isPublisher,
@@ -421,6 +513,8 @@ class {
 
     <else-if( state.widgetState === Constants.PRIMARY_BUTTON_WITH_WIDGET_OPEN )>
         <Controls
+           recording = state.recording
+           screenSharing = state.screenSharing
            mobile = mobile
            createdBy = state.sessionData.created_by
            isPublisher = state.isPublisher
@@ -454,6 +548,8 @@ class {
 
     <if(state.isMedia  && state.widgetInitialized && !state.isDisconnected)>
         <MediaConnection
+           tracksInitialized = component.tracksInitialized.bind(component)  
+           conferenceInitialized = component.conferenceInitialized.bind(component)  
            isPublisher = state.isPublisher
            showToast = component.showToast.bind(component)
            onMediaControlChange = component.onMediaControlChange.bind(component)

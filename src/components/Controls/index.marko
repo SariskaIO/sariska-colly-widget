@@ -1,4 +1,4 @@
-import { INVITE_PEOPLE, IS_CHAT, REPORT_PROBLEM, SYNC_WITH_CURRENT_URL } from "../../constants";
+import { INVITE_PEOPLE, IS_CHAT, REPORT_PROBLEM, SYNC_WITH_CURRENT_URL,IS_SCREEN_SHARING, IS_REOCRDING } from "../../constants";
 import person_add from "../Icons/person_add.marko";
 import call_end from "../Icons/call_end.marko";
 import chat from "../Icons/chat.marko";
@@ -6,11 +6,17 @@ import videocam from "../Icons/videocam";
 import videocam_off from  "../Icons/videocam_off";
 import report_problem from  "../Icons/report_problem";
 import sync from  "../Icons/sync.marko";
+import screenSharing from "../Icons/screen_sharing.marko";
+import screenSharingOff from "../Icons/screen_sharing_off.marko";
+import recordingOn from "../Icons/recording_on.marko";
+import recordingOff from "../Icons/recording_off.marko";
 
 class {
+  
   invitePeople(event) {
      this.input.secondaryButtonAction(INVITE_PEOPLE);
   }
+ 
 }
 
 <div class=["cb__widgetControls", component.input.isWidgetHidden && "cb__widgetControls--hidden"]>
@@ -29,12 +35,42 @@ class {
            <span class="material-icons mdc-fab__icon"><${chat}/></span>
        </div>
      </div>
+    
      <div class="cb__widgetControls__menu">
-        <label  class="mdc-elevation--z6 mdc-typography">Help & feedback</label>
-        <div  onClick(()=>{ component.input.secondaryButtonAction(REPORT_PROBLEM)}) class="mdc-fab mdc-fab--mini cb__widgetControls__button">
+       <if(component.input.screenSharing)> 
+          <label class="mdc-elevation--z6 mdc-typography">Stop Sharing</label>
+       </if>
+       <else>
+          <label class="mdc-elevation--z6 mdc-typography">Start Sharing</label>
+       </else>
+       <div onClick(()=>{ component.input.secondaryButtonAction(IS_SCREEN_SHARING)}) class="mdc-fab mdc-fab--mini cb__widgetControls__button">
            <div class="mdc-fab__ripple"></div>
-           <span class="material-icons mdc-fab__icon"><${report_problem}/></span>
-        </div>
-     </div>
+         <if(component.input.screenSharing)> 
+           <span class="material-icons mdc-fab__icon"><${screenSharingOff}/></span>
+         </if>
+         <else>
+           <span class="material-icons mdc-fab__icon"><${screenSharing}/></span>
+         </else>
+       </div>
+    </div>
+
+    <div class="cb__widgetControls__menu">
+       <if(component.input.recording)> 
+          <label  class="mdc-elevation--z6 mdc-typography">Stop Recording</label>
+       </if>
+       <else>
+         <label  class="mdc-elevation--z6 mdc-typography">Start Recording</label>  
+       </else>
+       <div onClick(()=>{ component.input.secondaryButtonAction(IS_REOCRDING)}) class="mdc-fab mdc-fab--mini cb__widgetControls__button">
+          <div class="mdc-fab__ripple"></div>
+          <if(component.input.recording)> 
+             <span class="material-icons mdc-fab__icon"><${recordingOff}/></span>
+          </if>
+          <else>
+            <span class="material-icons mdc-fab__icon"><${recordingOn}/></span>
+         </else>
+    </div>
+    </div>
+
    </if>
 </div>

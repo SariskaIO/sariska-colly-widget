@@ -10,6 +10,18 @@
     z-index: 9;
     font-size: 14px!important;
   }
+  
+  &__screenSharing {
+     position: absolute;
+     right: 8px;
+     bottom: 0px;
+     fill: #27CED7;
+     svg {
+       height: 24px;
+       width: 24px;
+     }
+  }
+  
   &__mic {
     color: white;
     position: absolute;

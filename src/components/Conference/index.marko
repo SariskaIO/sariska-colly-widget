@@ -12,6 +12,7 @@ class  {
          isMouseDown: false,
          coordinateShift: {},
          recordingSession: null,
+         presenterId: null,
          remoteTracks : [],
          recordingEnabled: false,
          localTracks: []
@@ -27,27 +28,34 @@ class  {
             if (item._properties && item._properties.hasOwnProperty("recording")) {
                 this.state.recordingEnabled = true;
             }
+            if (item._properties.presenting === "start") {
+              this.state.presenterId = participant._id;
+            }
         });
       });
-      conference.on(SariskaMediaTransport.events.conference.RECORDER_STATE_CHANGED, (data) => {
-            if (data._status === "on" && data._mode === "file") {
-                this.state.recordingEnabled = true;
-                input.showToast("Recording Started");
-            }
 
-            if (data._status === "off" && data._mode === "file") {
-                this.state.recordingEnabled = false;
-                input.showToast("Recording Stopped");
-            }
+      conference.on(SariskaMediaTransport.events.conference.PARTICIPANT_PROPERTY_CHANGED, (participant, key, oldValue, newValue) =>{
+          if (key === "presenting" && newValue === "start") {
+              this.state.presenterId = participant._id;
+              conference.selectParticipant(participant._id);
+          }
+
+          if (key === "presenting" && newValue === "stop") {
+              this.state.presenterId = null;
+              console.log("this.state.presenterId", this.state.presenterId);
+              this.setStateDirty("remoteTracks");
+          }
       });
 
       conference.join();
       this.state.conference = conference;
+      input.conferenceInitialized(conference);
 
       const setupLocalStream = async ()=> {
          const tracks = await SariskaMediaTransport.createLocalTracks({devices:["audio", "video"], resolution: "180"});
          tracks.forEach(item=>conference.addTrack(item));
          this.state.localTracks = tracks;
+         input.tracksInitialized(tracks);
          this.setStateDirty("localTracks");
       }
 
@@ -70,7 +78,7 @@ class  {
           this.setStateDirty("remoteTracks");
       }
 
-      window.addEventListener("beforeunload", this.leaveConference.bind(this));
+       window.addEventListener("beforeunload", this.leaveConference.bind(this));
    }
 
    mouseUp() {
@@ -81,10 +89,10 @@ class  {
    }
 
    mouseMove(e) {
-      const element = this.getEl("mediaWidget");
-      const boudingRect  = element.getBoundingClientRect();
-      element.style.bottom = this.state.coordinateShift.y - e.clientY + this.state.coordinateShift.bottom + 'px';
-      element.style.left =  e.clientX - this.state.coordinateShift.left+ 'px';
+      //const element = this.getEl("mediaWidget");
+      //const boudingRect  = element.getBoundingClientRect();
+      //element.style.bottom = this.state.coordinateShift.y - e.clientY + this.state.coordinateShift.bottom + 'px';
+      //element.style.left =  e.clientX - this.state.coordinateShift.left+ 'px';
    }
 
    mouseDown(e) {
@@ -113,25 +121,6 @@ class  {
                  this.state.conference.muteParticipant(participant.getJid(), value);
              });
              break;
-          case RECORDING_TOGGLE:
-              if (!this.state.recordingSession) {
-                  const appData = {
-                      file_recording_metadata : {
-                         'share': true
-                      }
-                  };
-                  const session = await this.state.conference.startRecording({
-                      mode: SariskaMediaTransport.constants.recording.mode.FILE,
-                      appData: JSON.stringify(appData)
-                  });
-                  this.state.recordingSession = session;
-                  this.state.conference.setLocalParticipantProperty("recording");
-              } else {
-                  await this.state.conference.stopRecording(this.state.recordingSession._sessionID);
-                  this.state.conference.removeLocalParticipantProperty("recording");
-                  this.state.recordingSession = null;
-              }
-              break;
           case MIC_TOGGLE:
              this.state.localTracks.forEach(track=>{
                 if (track.getType()==="audio") {
@@ -163,9 +152,28 @@ class  {
 }
 
 <div id="cb--media-container" onMouseUp("mouseUp") onMouseDown("mouseDown") key="mediaWidget" class=["cb__mediaContainer", "mdc-elevation--z6"]>
-   <VideoControls recordingEnabled = state.recordingEnabled isPublisher=component.input.isPublisher closeSession = component.closeSession.bind(component)  videoControlAction = component.videoControlAction.bind(component) widgetToggle=component.input.widgetToggle  videoEnabled=component.input.videoEnabled  muteAll=component.input.muteAll videoWidget=component.input.videoWidget />
+   <VideoControls 
+        recordingEnabled = state.recordingEnabled isPublisher=component.input.isPublisher closeSession = component.closeSession.bind(component)  videoControlAction = component.videoControlAction.bind(component) widgetToggle=component.input.widgetToggle  videoEnabled=component.input.videoEnabled  muteAll=component.input.muteAll videoWidget=component.input.videoWidget 
+   />
    <div class=["cb__mediaContainer__widget"]>
-        <div.cb__mediaContainer__local><LocalStream videoEnabled=component.input.videoEnabled  videoWidget = component.input.videoWidget audioEnabled=component.input.audioEnabled  videoControlAction = component.videoControlAction.bind(component) localTracks = state.localTracks conference = state.conference /></div>
-        <div.cb__mediaContainer__remote><RemoteStream  videoWidget = component.input.videoWidget remoteTracks = state.remoteTracks  videoControlAction = component.videoControlAction.bind(component) conference = state.conference /></div>
+         <div.cb__mediaContainer__local>
+              <LocalStream videoEnabled=component.input.videoEnabled  videoWidget = component.input.videoWidget     
+                audioEnabled=component.input.audioEnabled  videoControlAction = component.videoControlAction.bind(component) localTracks = state.localTracks conference = state.conference
+             />
+        </div>
+        <div.cb__mediaContainer__remote>
+          <RemoteStream
+              presenterId = state.presenterId
+              videoWidget = component.input.videoWidget 
+              remoteTracks = state.remoteTracks  
+              videoControlAction = component.videoControlAction.bind(component) 
+              conference = state.conference 
+          />
+        </div> 
+        <for|track, index| of=state.remoteTracks>
+              <if (track.getParticipantId() === state.presenterId && track.getType() === "video")>
+                  <LargeVideo isSharing = true user={} track=track  />
+              </if>
+        </for>
    </div>
 </div>

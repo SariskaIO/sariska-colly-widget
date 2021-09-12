@@ -1,0 +1,11 @@
+.cb__largeVideo {
+  position: relative;
+  position: fixed;
+  right: 0;
+  top: 56px;
+  video {
+     object-fit: cover;
+     width: 100%;
+     height: 100%;
+  }
+}

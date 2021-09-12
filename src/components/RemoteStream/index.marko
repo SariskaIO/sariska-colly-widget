@@ -5,10 +5,15 @@ import { getUser } from "../../utils";
 <for|track, index| of=component.input.remoteTracks>
    <div.cb__mediaContainer__item>
       <if (track.isVideoTrack() && component.input.videoWidget)>
-         <Video videoControlAction=component.input.videoControlAction user=getUser(track, component.input.conference)  key=track.track.id track=track />
+         	<Video 
+               isPresenting=(component.input.presenterId === track.getParticipantId())
+         		videoControlAction=component.input.videoControlAction
+         		user=getUser(track, component.input.conference)
+         		key=track.track.id track=track 
+         	/>
       </if>
       <else>
-         <Audio key=track.track.id track=track />
+         	<Audio key=track.track.id track=track />
       </else>
    </div>
 </for>

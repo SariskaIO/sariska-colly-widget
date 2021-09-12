@@ -1,0 +1,32 @@
+import SariskaMediaTransport from "sariska-media-transport";
+import mic from "../Icons/mic.marko";
+import mic_off from "../Icons/mic_off.marko";
+import { MIC_TOGGLE } from "../../constants";
+
+import './index.scss';
+
+class {
+ 
+   onMount() {
+      this.input.track.attach(this.getEl("video"));
+   }
+
+   onDestroy() {
+      this.input.track.detach(this.getEl("video"));
+   }
+
+  getEditorDimension() {
+      const elem = document.getElementsByClassName("editor-container");
+      return {
+        height: elem[0] && elem[0].clientHeight || 678 ,
+        width: elem[0] && elem[0].clientWidth || 1107,
+      }
+   }
+}
+
+
+<div.cb__largeVideo style={ "height": component.getEditorDimension().height+"px", "width": component.getEditorDimension().width+"px" } >
+   <video playsInline="1" autoPlay='1' key="video"/>
+</div>
+
+
