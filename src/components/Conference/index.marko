@@ -42,7 +42,6 @@ class  {
 
           if (key === "presenting" && newValue === "stop") {
               this.state.presenterId = null;
-              console.log("this.state.presenterId", this.state.presenterId);
               this.setStateDirty("remoteTracks");
           }
       });
@@ -89,10 +88,10 @@ class  {
    }
 
    mouseMove(e) {
-      //const element = this.getEl("mediaWidget");
-      //const boudingRect  = element.getBoundingClientRect();
-      //element.style.bottom = this.state.coordinateShift.y - e.clientY + this.state.coordinateShift.bottom + 'px';
-      //element.style.left =  e.clientX - this.state.coordinateShift.left+ 'px';
+      const element = this.getEl("mediaWidget");
+      const boudingRect  = element.getBoundingClientRect();
+      element.style.bottom = this.state.coordinateShift.y - e.clientY + this.state.coordinateShift.bottom + 'px';
+      element.style.left =  e.clientX - this.state.coordinateShift.left+ 'px';
    }
 
    mouseDown(e) {
@@ -172,7 +171,7 @@ class  {
         </div> 
         <for|track, index| of=state.remoteTracks>
               <if (track.getParticipantId() === state.presenterId && track.getType() === "video")>
-                  <LargeVideo isSharing = true user={} track=track  />
+                  <LargeVideo key=track.track.id  isSharing = true user={} track=track  />
               </if>
         </for>
    </div>
