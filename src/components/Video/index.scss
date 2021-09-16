@@ -12,25 +12,38 @@
   }
   
   &__screenSharing {
-     position: absolute;
-     right: 8px;
-     bottom: 0px;
-     fill: #27CED7;
+    position: absolute;
+    right: 6px;
+    bottom: 3px;
+    fill: #123fbc;
      svg {
        height: 24px;
        width: 24px;
      }
   }
   
+  &__zoomIcon {
+      cursor: pointer;
+     position: absolute;
+     right: 5px;
+     top: 9px;
+     fill: #123fbc;
+     svg {
+       height: 24px;
+       width: 24px;
+     }
+  }
+
+
   &__mic {
-    color: white;
+    cursor: pointer;
     position: absolute;
     bottom: 0;
     right: 0;
     z-index: 9;
     cursor: pointer;
     svg {
-      fill: white;
+      fill: #123fbc;
     }
   }
 
@@ -42,13 +55,14 @@
   }
 
   &__thumbnail {
+
     position: absolute;
     text-align: center;
     top: 0;
     left: -1px;
     font-size: 40px;
     color: green;
-    background: #d0caca;
+    background: #263238;
     bottom: -1px;
     right: -2px;
     display: flex;

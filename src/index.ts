@@ -1,3 +1,4 @@
+window["Colly"] = {};
 require("babel-polyfill");
 import "./load-style"; //load style dynamically(without specifying link tag in html) based on build env
 // @ts-ignore

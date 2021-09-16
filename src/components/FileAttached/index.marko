@@ -28,10 +28,10 @@ class {
 
 <div.cb__attached>
    <if(state.type === "photos")>
-      <div.cb__attached__thumbnail><img src=state.url /></div>
+      <div.cb__attached__thumbnail style={ color: component.input.primaryColor } ><img src=state.url /></div>
    </if>
    <else>
-      <div.cb__attached__thumbnail><${document}/></div>
+      <div.cb__attached__thumbnail style={ color: component.input.primaryColor } ><${document}/></div>
    </else>
    <div.cb__attached__filename>
       <div>${state.name}&nbsp;&nbsp;${formatBytes(state.size)}</div>
@@ -45,5 +45,5 @@ class {
         <div.cb__attached__uploading>Uploading...</div>
       </else-if>
    </div>
-   <div.cb__attached__close onClick("onClick") ><${close}/></div>
+   <div.cb__attached__close onClick("onClick") style={ color: component.input.primaryColor }  ><${close}/></div>
 </div>

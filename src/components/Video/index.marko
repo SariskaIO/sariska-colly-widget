@@ -2,7 +2,10 @@ import SariskaMediaTransport from "sariska-media-transport";
 import mic from "../Icons/mic.marko";
 import mic_off from "../Icons/mic_off.marko";
 import screen_sharing from "../Icons/screen_sharing.marko";
-import { MIC_TOGGLE } from "../../constants";
+import full_screen from "../Icons/fullscreen.marko";
+import full_screen_exit from "../Icons/fullscreen_exit.marko";
+import { MIC_TOGGLE, FULL_SCREEN_TOGGLE } from "../../constants";
+import { getDimensions } from  "../../utils";
 
 import './index.scss';
 
@@ -11,7 +14,6 @@ class {
        this.state = {
           showTT: false
        }
-       console.log("input", input);
    }
    
    onMount() {
@@ -33,11 +35,7 @@ class {
 
 
 <div.cb__video>
-   
-   <if(!component.input.isPresenting)>
-      <video playsInline="1" autoPlay='1' key="video"/>
-   </if>
-
+   <video playsInline="1" autoPlay='1' key="video"/>
    <if(component.input.track.isLocal()) >
        <div class="cb__video__name">You</div>
    </if>
@@ -47,23 +45,35 @@ class {
 
    <if(component.input.track.isLocal())>
       <if(component.input.audioEnabled)>
-         <span onMouseOut("mouseOut") onMouseEnter("mouseEnter") onClick("onClick", MIC_TOGGLE, component.input.audioEnabled)  class="cb__video__mic" ><${mic}/></span>
+         <span onMouseOut("mouseOut") onMouseEnter("mouseEnter") onClick("onClick", MIC_TOGGLE, component.input.audioEnabled)  class="cb__video__mic" style={ color: component.input.primaryColor }  ><${mic}/></span>
       </if>
       <else>
-         <span onMouseOut("mouseOut") onMouseEnter("mouseEnter") onClick("onClick", MIC_TOGGLE, component.input.audioEnabled) class="cb__video__mic"  ><${mic_off}/></span>
+         <span onMouseOut("mouseOut") onMouseEnter("mouseEnter") onClick("onClick", MIC_TOGGLE, component.input.audioEnabled) class="cb__video__mic" style={ color: component.input.primaryColor }   ><${mic_off}/></span>
       </else>
       <if(state.showTT)>
          <Tooltip  style={top:"61px", right: "-40px"},  text=component.input.track.isMuted() ? "Stop My Audio" : "Start My Audio"/>
       </if>
    </if>
 
-   <if(component.input.track.isMuted() || (component.input.track.isLocal() && !component.input.videoEnabled) || component.input.isPresenting)>
+   <if(component.input.track.isMuted() || (component.input.track.isLocal() && !component.input.videoEnabled))>
       <div class="cb__video__thumbnail">${component.input.user.name && component.input.user.name[0]}</div>
+   </if>
+
+   <if(component.input.isPresenting)>
+       <if(component.input.zoomIn)>
+          <span.cb__video__zoomIcon 
+             style={ color: component.input.primaryColor } 
+             onClick("onClick", FULL_SCREEN_TOGGLE)><${full_screen_exit}/></span>
+       </if>
+       <else>
+          <span.cb__video__zoomIcon 
+          style={ color: component.input.primaryColor } 
+          onClick("onClick", FULL_SCREEN_TOGGLE)><${full_screen}/></span>
+       </else>
    </if>
 
    <if(component.input.isPresenting)>
       <span.cb__video__screenSharing><${screen_sharing}/></span>
    </if>
-
 </div>
 

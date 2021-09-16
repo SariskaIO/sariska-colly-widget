@@ -57,31 +57,31 @@ class {
 
 }
 
-<div onClick(component.input.loading ? "" : "onClick") class=["mdc-fab cb__primaryBtn"]>
+<div style={ color: component.input.primaryColor, backgroundColor: component.input.primaryBackgroundColor} onClick(component.input.loading ? "" : "onClick") class=["mdc-fab cb__primaryBtn"]>
    <div class="mdc-fab__ripple"></div>
    <if(component.input.loading)>
-       <Loader />
+       <Loader style={ color: component.input.primaryColor }/>
    </if>
    <else-if(component.input.widgetState === Constants.ERROR )>
-        <span class=["material-icons", "mdc-fab__icon", "cb__primaryBtn__icon", state.rotate]><${report_problem}/></span>
+        <span style={ color: component.input.primaryColor } class=["material-icons", "mdc-fab__icon", "cb__primaryBtn__icon", state.rotate]><${report_problem}/></span>
    </else-if>
    <else-if(component.input.widgetState === Constants.PRIMARY_BUTTON )>
-       <span class=["material-icons", "mdc-fab__icon", "cb__primaryBtn__icon", state.rotate]><${add}/></span>
+       <span style={ color: component.input.primaryColor } class=["material-icons", "mdc-fab__icon", "cb__primaryBtn__icon", state.rotate]><${add}/></span>
    </else-if>
    <else-if(component.input.widgetState === Constants.PRIMARY_BUTTON_WITH_INPUT )>
-        <span class=["material-icons", "mdc-fab__icon", "cb__primaryBtn__icon", state.rotate]><${arrow_forward}/></span>
+        <span style={ color: component.input.primaryColor } class=["material-icons", "mdc-fab__icon", "cb__primaryBtn__icon", state.rotate]><${arrow_forward}/></span>
    </else-if>
    <else-if(component.input.widgetState === Constants.PRIMARY_BUTTON_WITH_WIDGET_OPEN )>
-       <span class=["material-icons", "mdc-fab__icon", "cb__primaryBtn__icon", state.rotate]><${close}/></span>
+       <span style={ color: component.input.primaryColor } class=["material-icons", "mdc-fab__icon", "cb__primaryBtn__icon", state.rotate]><${close}/></span>
    </else-if>
    <else-if(component.input.widgetState === Constants.PRIMARY_BUTTON_WITH_WIDGET_CLOSE )>
-       <span class=["material-icons", "mdc-fab__icon", "cb__primaryBtn__icon", state.rotate]><${menu}/></span>
+       <span style={ color: component.input.primaryColor } class=["material-icons", "mdc-fab__icon", "cb__primaryBtn__icon", state.rotate]><${menu}/></span>
    </else-if>
    <else-if(component.input.widgetState === Constants.INVITE_PEOPLE )>
-      <span class=["material-icons", "mdc-fab__icon", "cb__primaryBtn__icon", state.rotate]><${keyboard_backspace}/></span>
+      <span style={ color: component.input.primaryColor } class=["material-icons", "mdc-fab__icon", "cb__primaryBtn__icon", state.rotate]><${keyboard_backspace}/></span>
    </else-if>
    <else-if(component.input.widgetState === Constants.AFTER_CLOSE_SESSION_PUBLISHER || component.input.widgetState === Constants.AFTER_CLOSE_SESSION_SUBSCRIBER )>
-       <span class=["material-icons", "mdc-fab__icon", "cb__primaryBtn__icon", state.rotate]><${close}/></span>
+       <span style={ color: component.input.primaryColor } class=["material-icons", "mdc-fab__icon", "cb__primaryBtn__icon", state.rotate]><${close}/></span>
    </else-if>
    <if(component.input.unreadMessage && !component.input.isDisconnected)>
        <span.cb__primaryBtn__notification>1</span>

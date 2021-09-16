@@ -65,9 +65,7 @@
     align-items: center;
     width: 100%;
     flex: 1;
-    svg {
-      color: #27CED7;
-    }
+
   }
 
   &__zoom {
@@ -101,9 +99,6 @@
     flex: 1;
     background: white;
     box-shadow: none;
-    svg {
-      fill: #27CED7;
-    }
   }
 
   &__name {

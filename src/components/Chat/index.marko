@@ -99,8 +99,8 @@ class {
       if ( input.isChat !== this.state.isChat) {
           this.scrollToBottom();
       }
+      this.state.archivedMessageCount = input.archivedMessageCount;
       this.state.isChat = input.isChat;
-
       this.state.usersList = input.usersList;
       this.setStateDirty("usersList");
       this.state.messages = input.messages;
@@ -207,13 +207,13 @@ class {
         </div>
         <if(!component.input.mobile)>
            <div class="cb__chatWrapper__rightControl">
-              <div onClick("zoomIn") class="cb__chatWrapper__zoom material-icons mdc-fab__icon">
+              <div style={color: component.input.primaryColor} onClick("zoomIn") class="cb__chatWrapper__zoom material-icons mdc-fab__icon">
                  <span onMouseOut("mouseOut", "minimizeTT") onMouseOver("mouseEnter", "minimizeTT") class="cb__chatWrapper__mixMaxBtn material-icons" ><${ state.minimize ? maximize : minimize}/></span>
               </div>
               <if(state.minimizeTT)>
                  <Tooltip text = getText(state.isZoomed) style={ top:"-31px", left:"-16px" }  />
               </if>
-              <div onClick("closeChat")  class="cb__chatWrapper__close material-icons mdc-fab__icon">
+              <div style={color: component.input.primaryColor} onClick("closeChat")  class="cb__chatWrapper__close material-icons mdc-fab__icon">
                   <span onMouseOut("mouseOut", "closeTT") onMouseOver("mouseEnter", "closeTT")><${close}/></span>
               </div>
               <if(state.closeTT)>
@@ -257,11 +257,17 @@ class {
             <div.cb__chatWrapper__sendContainer>
                <div onClick("sendMessage") class="mdc-fab mdc-fab--mini cb__chatWrapper__send">
                   <div class="mdc-fab__ripple"></div>
-                  <span class="material-icons mdc-fab__icon"><${send}/></span>
+                  <span  style={color: component.input.primaryColor} class="material-icons mdc-fab__icon"><${send}/></span>
                </div>
            </div>
         </div>
-        <MediaPickerChat startFileUpload = component.startFileUpload.bind(component) setEmoji = component.setEmoji.bind(component) sessionInfo = state.sessionInfo />
+        <MediaPickerChat
+            primaryColor =  component.input.primaryColor
+            primaryBackgroundColor =  component.input.primaryBackgroundColor
+            startFileUpload = component.startFileUpload.bind(component)
+            setEmoji = component.setEmoji.bind(component) 
+            sessionInfo = state.sessionInfo 
+        />
      </if>
   </if>
 </div>

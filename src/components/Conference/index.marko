@@ -1,5 +1,5 @@
 import SariskaMediaTransport from "sariska-media-transport";
-import { MUTE_ALL_TOGGLE, VIDEO_TOGGLE, WIDGET_TOGGLE, CALL_END, MIC_TOGGLE, RECORDING_TOGGLE } from "../../constants";
+import { MUTE_ALL_TOGGLE, VIDEO_TOGGLE, WIDGET_TOGGLE, CALL_END, MIC_TOGGLE, RECORDING_TOGGLE, FULL_SCREEN_TOGGLE } from "../../constants";
 import { getDimensions } from  "../../utils";
 import "./index.scss";
 
@@ -9,11 +9,12 @@ class  {
       const { connection } = input;
       this.state = {
          conference: null,
-         isMouseDown: false,
-         coordinateShift: {},
          recordingSession: null,
          presenterId: null,
          remoteTracks : [],
+         zoomIn: false,
+         isMouseDown: false,
+         coordinateShift: {},
          recordingEnabled: false,
          localTracks: []
       }
@@ -69,6 +70,9 @@ class  {
          if (!track  || track.isLocal()) {
              return;
          }
+         
+         console.log("remote track added", track);
+
          this.state.remoteTracks.push(track);
          this.setStateDirty("remoteTracks");
       }
@@ -77,7 +81,37 @@ class  {
           this.setStateDirty("remoteTracks");
       }
 
-       window.addEventListener("beforeunload", this.leaveConference.bind(this));
+      window.addEventListener("beforeunload", this.leaveConference.bind(this));
+   }
+
+   async videoControlAction(actionKey, value) {
+       this.input.onMediaControlChange(actionKey, value);
+       switch(actionKey) {
+          case VIDEO_TOGGLE:
+             this.state.localTracks.forEach(track=>{
+                if ( track.getType() === "video" ) {
+                   track.isMuted() ? track.unmute(): track.mute();
+                }
+            });
+            break;
+          case MUTE_ALL_TOGGLE:
+             this.state.conference.getParticipants().forEach(participant=>{
+                 this.state.conference.muteParticipant(participant.getJid(), value);
+             });
+             break;
+          case MIC_TOGGLE:
+             this.state.localTracks.forEach(track=>{
+                if (track.getType()==="audio") {
+                   track.isMuted() ? track.unmute(): track.mute();
+                }
+             });
+             break;
+          case FULL_SCREEN_TOGGLE:
+             this.state.zoomIn = !this.state.zoomIn;
+             break;
+          default:
+            console.log("hi")
+       }
    }
 
    mouseUp() {
@@ -105,33 +139,6 @@ class  {
       document.addEventListener("mousemove", this.mouseMoveRef, true);
    }
 
-   async videoControlAction(actionKey, value) {
-       this.input.onMediaControlChange(actionKey, value);
-       switch(actionKey) {
-          case VIDEO_TOGGLE:
-             this.state.localTracks.forEach(track=>{
-                if ( track.getType() === "video" ) {
-                   track.isMuted() ? track.unmute(): track.mute();
-                }
-            });
-            break;
-          case MUTE_ALL_TOGGLE:
-             this.state.conference.getParticipants().forEach(participant=>{
-                 this.state.conference.muteParticipant(participant.getJid(), value);
-             });
-             break;
-          case MIC_TOGGLE:
-             this.state.localTracks.forEach(track=>{
-                if (track.getType()==="audio") {
-                   track.isMuted() ? track.unmute(): track.mute();
-                }
-             });
-             break;
-          default:
-            console.log("hi")
-       }
-   }
-
    closeSession(actionKey, value) {
       this.leaveConference();
       this.input.closeCurrentSession();
@@ -150,29 +157,52 @@ class  {
 
 }
 
-<div id="cb--media-container" onMouseUp("mouseUp") onMouseDown("mouseDown") key="mediaWidget" class=["cb__mediaContainer", "mdc-elevation--z6"]>
+<div id="cb--media-container"  onMouseUp("mouseUp") onMouseDown("mouseDown") key="mediaWidget"  class=["cb__mediaContainer", "mdc-elevation--z6"]>
    <VideoControls 
-        recordingEnabled = state.recordingEnabled isPublisher=component.input.isPublisher closeSession = component.closeSession.bind(component)  videoControlAction = component.videoControlAction.bind(component) widgetToggle=component.input.widgetToggle  videoEnabled=component.input.videoEnabled  muteAll=component.input.muteAll videoWidget=component.input.videoWidget 
+        primaryColor = component.input.primaryColor
+        primaryBackgroundColor = component.input.primaryBackgroundColor 
+        recordingEnabled = state.recordingEnabled 
+        isPublisher=component.input.isPublisher 
+        closeSession = component.closeSession.bind(component)  
+        videoControlAction = component.videoControlAction.bind(component) 
+        widgetToggle=component.input.widgetToggle  
+        videoEnabled=component.input.videoEnabled  
+        muteAll=component.input.muteAll 
+        videoWidget=component.input.videoWidget 
    />
    <div class=["cb__mediaContainer__widget"]>
-         <div.cb__mediaContainer__local>
-              <LocalStream videoEnabled=component.input.videoEnabled  videoWidget = component.input.videoWidget     
-                audioEnabled=component.input.audioEnabled  videoControlAction = component.videoControlAction.bind(component) localTracks = state.localTracks conference = state.conference
-             />
-        </div>
-        <div.cb__mediaContainer__remote>
+         <LocalStream 
+              primaryBackgroundColor = component.input.primaryBackgroundColor
+              primaryColor = component.input.primaryColor
+              videoEnabled=component.input.videoEnabled  
+              videoWidget = component.input.videoWidget     
+              audioEnabled=component.input.audioEnabled  
+              videoControlAction = component.videoControlAction.bind(component) 
+              localTracks = state.localTracks 
+              conference = state.conference
+          />
           <RemoteStream
+              zoomIn = state.zoomIn
+              primaryBackgroundColor = component.input.primaryBackgroundColor
+              primaryColor = component.input.primaryColor
               presenterId = state.presenterId
               videoWidget = component.input.videoWidget 
               remoteTracks = state.remoteTracks  
               videoControlAction = component.videoControlAction.bind(component) 
               conference = state.conference 
           />
-        </div> 
-        <for|track, index| of=state.remoteTracks>
-              <if (track.getParticipantId() === state.presenterId && track.getType() === "video")>
-                  <LargeVideo key=track.track.id  isSharing = true user={} track=track  />
-              </if>
-        </for>
+
+          <if(state.zoomIn)>
+             <for|track, index| of=state.remoteTracks>
+                  <if (track.getParticipantId() === state.presenterId && track.getType() === "video")>
+                      <LargeVideo
+                          key=track.track.id
+                          isSharing = true 
+                          user={} 
+                          track=track
+                      />
+                  </if>
+             </for>
+         </if>
    </div>
 </div>

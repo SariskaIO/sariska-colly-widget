@@ -22,22 +22,29 @@ class {
     onCreate(input) {
         const persistedData = getL("cb__toolboxOptions") || {};
         const sessionData = syncWithParams({...persistedData.sessionData} || {});
+
         this.state = {
              token: null,
              socket: null,
              channel: null,
+             widget: false,
              widgetState: Constants.PRIMARY_BUTTON,
              isChat: persistedData.isChat,
-             loading: false,
+             loading: false,             
              recordingSession: null,
              sessionData,
+             moderator: true,
              coordinateShift:{},
              desktopTrack: null,
+             archivedMessageCount: 0,
              recording: false,
              conference: null,
              screenSharing: false,
              localTracks: [],
              usersList: [],
+             prestartRecording: false,
+             primaryColor: "#123fbc",
+             primaryBackgroundColor: "white",
              messages:[],
              isMouseDown: false,
              name: '',
@@ -56,10 +63,9 @@ class {
              videoWidget: persistedData.videoWidget===undefined ? true : persistedData.videoWidget,
         }
 
-
-        console.log(persistedData, sessionData)
         if (sessionData.name && sessionData.session_id && !this.state.isDisconnected || persistedData.sessionData && persistedData.sessionData.session_id != sessionData.session_id) {
            console.log("sesssion joined"); 
+           this.state.widget = true;
            this.joinSession();
         }
 
@@ -69,6 +75,15 @@ class {
         document.addEventListener("mouseup", this.mouseUp.bind(this), false);
         document.addEventListener("click", this.documentClick, false);
         this.mouseMoveRef = this.mouseMove.bind(this);
+        
+        window.addEventListener('popstate', ()=>{
+           if (sessionData.name && sessionData.session_id) {
+                this.state.widget = true;
+            }  else {
+                this.state.widget = false;
+            }
+        });
+
 
         const startRecorder = async ()=> {
           try  {
@@ -85,6 +100,60 @@ class {
         if (this.state.iAmRecorder) {
            startRecorder();
         }
+
+        if (this.state.theme) {
+           startRecorder();
+        }
+        const Colly = window.Colly;
+
+        Colly.setTheme = (theme)=>{
+            this.state.primaryColor  = theme.primaryColor;
+            this.state.primarBackgroundColor  = theme.primarBackgroundColor;
+        }
+
+        Colly.startCall = ()=>{
+            this.joinSession();
+        }
+
+        Colly.endCall = ()=>{
+            this.closeCurrentSession();
+        }
+
+        Colly.showWidget = ()=>{
+            this.state.widget = true;
+        }
+
+
+        Colly.setRole = (moderator)=>{
+            this.setRole(moderator);
+        }
+
+
+        Colly.hideWidget = ()=>{
+           this.state.widget = false;
+        }
+
+        Colly.startRecording = ()=>{
+          if (conference && conference.isJoined()) {
+              this.state.prestartRecording = true;
+          } else {
+              this.startRecording();
+          }
+        }
+
+      }
+
+      showWidget() {
+          this.state.widget = true;
+      }
+
+      hideWidget() {
+          this.state.widget = true;
+      }
+
+      setRole(isModerator) {
+          this.state.moderator = isModerator;
+          this.joinSession();
       }
 
       documentKeyDown(event) {
@@ -159,7 +228,7 @@ class {
          const urlParams = window.location.pathname.split("/");
          const sessionId =  urlParams[2];
          this.state.sessionData.session_id = sessionId;
-         this.state.sessionData.moderator = true;
+         this.state.sessionData.moderator = this.state.moderator;
          const token = await getToken(this.state.sessionData);
          if (!token) {
              console.log("no token");
@@ -224,6 +293,13 @@ class {
               this.setStateDirty("messages");
          });
 
+
+         this.state.channel.on(ChannelMesssageEvents.MessageCount,  (payload)=> {
+            if ( payload.page ) {
+               this.state.archivedMessageCount = payload.page.count;
+            }
+         });
+
          let presence = new Presence(this.state.channel);
 
          presence.onJoin((id, current, newPres) => {
@@ -266,11 +342,11 @@ class {
                  this.state.widgetState = Constants.PRIMARY_BUTTON_WITH_WIDGET_OPEN;
                  break;
             }
-    }
+      }
 
-    setPendingMessages() {
+      setPendingMessages() {
          this.state.unreadMessage = true;
-    }
+     }
 
      closeCurrentSession() {
          this.state.socket.disconnect();
@@ -397,6 +473,13 @@ class {
                     this.state.recording = false;
                 }
           });
+
+          conference.on(SariskaMediaTransport.events.conference.CONFERENCE_JOINED, () => {
+              if (this.state.prestartRecording) {
+                  setTimeout(()=>{this.startRecording()}, 5000); 
+              }
+          });
+
       }
 
       tracksInitialized(localTracks) {
@@ -463,27 +546,27 @@ class {
                 return;
             }
             const videoTrack = this.state.localTracks.find(track => track.videoType === "camera");
-            await this.state.conference.removeTrack(this.state.desktopTrack);
-            await this.state.conference.addTrack(videoTrack);
+            await this.state.conference.replaceTrack(this.state.desktopTrack, videoTrack);
             this.state.conference.setLocalParticipantProperty("presenting", "stop");
+            await this.state.desktopTrack.dispose();
             this.state.desktopTrack = null;
             this.state.screenSharing = false;
        }
 
        beforeReload() {
-         const data =  {
-            sessionData: this.state.sessionData,
-            isPublisher: this.state.isPublisher,
-            isDisconnected: this.state.isDisconnected,
-            unreadMessage: this.state.unreadMessage,
-            isChat: this.state.isChat,
-            isMedia: this.state.isMedia,
-            audioEnabled: this.state.audioEnabled,
-            videoEnabled: this.state.videoEnabled,
-            muteAll: this.state.muteAll,
-            videoWidget: this.state.videoWidget
-         }
-         setL("cb__toolboxOptions", data);
+            const data =  {
+                sessionData: this.state.sessionData,
+                isPublisher: this.state.isPublisher,
+                isDisconnected: this.state.isDisconnected,
+                unreadMessage: this.state.unreadMessage,
+                isChat: this.state.isChat,
+                isMedia: this.state.isMedia,
+                audioEnabled: this.state.audioEnabled,
+                videoEnabled: this.state.videoEnabled,
+                muteAll: this.state.muteAll,
+                videoWidget: this.state.videoWidget
+            }
+            setL("cb__toolboxOptions", data);
       }
 
       onDestroy() {
@@ -492,98 +575,117 @@ class {
       }
   }
 
-<div key="uiWidget" onMouseUp("mouseUp") onMouseDown("mouseDown") class=["cb__uiWidget", state.isMouseDown && "cb__uiWidget--move", state.widgetState === Constants.PRIMARY_BUTTON_WITH_INPUT && "cb__uiWidget--flexColumn"]>
-    <if(state.widgetState === Constants.PRIMARY_BUTTON_WITH_INPUT)>
-        <Input
-            inputBoxValue = component.inputBoxValue.bind(component)
-            widgetState = state.widgetState
-            inputBoxAction = component.inputBoxAction.bind(component)
-        />
-    </if>
+<if(state.widget)>
+    <div key="uiWidget" onMouseUp("mouseUp") onMouseDown("mouseDown") class=["cb__uiWidget", state.isMouseDown && "cb__uiWidget--move", state.widgetState === Constants.PRIMARY_BUTTON_WITH_INPUT && "cb__uiWidget--flexColumn"]>
+        <if(state.widgetState === Constants.PRIMARY_BUTTON_WITH_INPUT)>
+            <Input
+                inputBoxValue = component.inputBoxValue.bind(component)
+                widgetState = state.widgetState
+                inputBoxAction = component.inputBoxAction.bind(component)
+            />
+        </if>
 
-    <else-if( state.widgetState === Constants.INPUT_WITH_OVERLAY )>
-        <DialogPopup
-            userSelectedMediaOptions = component.userSelectedMediaOptions.bind(component)
-            dialogBoxAction = component.dialogBoxAction.bind(component)
-            widgetState = state.widgetState
-            inputBoxAction = component.inputBoxAction.bind(component)
-            guestName = state.sessionData.guestName
-            inputBoxValue = component.inputBoxValue.bind(component)
-        />
-    </else-if>
+        <else-if( state.widgetState === Constants.INPUT_WITH_OVERLAY )>
+            <DialogPopup
+                primaryBackgroundColor = state.primaryBackgroundColor
+                primaryColor = state.primaryColor
+                userSelectedMediaOptions = component.userSelectedMediaOptions.bind(component)
+                dialogBoxAction = component.dialogBoxAction.bind(component)
+                widgetState = state.widgetState
+                inputBoxAction = component.inputBoxAction.bind(component)
+                guestName = state.sessionData.guestName
+                inputBoxValue = component.inputBoxValue.bind(component)
+            />
+        </else-if>
 
-    <else-if( state.widgetState === Constants.PRIMARY_BUTTON_WITH_WIDGET_OPEN )>
-        <Controls
-           recording = state.recording
-           screenSharing = state.screenSharing
-           mobile = mobile
-           createdBy = state.sessionData.created_by
-           isPublisher = state.isPublisher
-           closeCurrentSession = component.closeCurrentSession.bind(component)
-           secondaryButtonAction = component.secondaryButtonAction.bind(component)
-           loading = state.loading
-        />
-    </else-if>
+        <else-if( state.widgetState === Constants.PRIMARY_BUTTON_WITH_WIDGET_OPEN )>
+            <Controls
+               primaryBackgroundColor = state.primaryBackgroundColor
+               primaryColor = state.primaryColor
+               recording = state.recording
+               screenSharing = state.screenSharing
+               mobile = mobile
+               createdBy = state.sessionData.created_by
+               isPublisher = state.isPublisher
+               closeCurrentSession = component.closeCurrentSession.bind(component)
+               secondaryButtonAction = component.secondaryButtonAction.bind(component)
+               loading = state.loading
+            />
+        </else-if>
 
-    <else-if( state.widgetState === Constants.INVITE_PEOPLE )>
-        <SharingDrawer
-           sessionData = state.sessionData
-           secondaryButtonAction = component.secondaryButtonAction.bind(component)
-        />
-    </else-if>
+        <else-if( state.widgetState === Constants.INVITE_PEOPLE )>
+            <SharingDrawer
+               primaryBackgroundColor = state.primaryBackgroundColor
+               primaryColor = state.primaryColor
+               sessionData = state.sessionData
+               secondaryButtonAction = component.secondaryButtonAction.bind(component)
+            />
+        </else-if>
 
-    <else-if( state.widgetState === Constants.REPORT_PROBLEM )>
-        <Feedback sessionData = state.sessionData dialogBoxAction = component.dialogBoxAction.bind(component) />
-    </else-if>
+        <else-if( state.widgetState === Constants.AFTER_CLOSE_SESSION_PUBLISHER )>
+            <Publisher            
+                  primaryBackgroundColor = state.primaryBackgroundColor
+                  primaryColor = state.primaryColor
+                  joinPastSession = component.joinPastSession.bind(component) 
+            />
+        </else-if>
 
-    <else-if( state.widgetState === Constants.AFTER_CLOSE_SESSION_PUBLISHER )>
-        <Publisher joinPastSession = component.joinPastSession.bind(component) />
-    </else-if>
+        <else-if( state.widgetState === Constants.AFTER_CLOSE_SESSION_SUBSCRIBER )>
+            <Subscriber            
+                primaryBackgroundColor = state.primaryBackgroundColor
+                primaryColor = state.primaryColor
+                joinPastSession = component.joinPastSession.bind(component)
+            />
+        </else-if>
 
-    <else-if( state.widgetState === Constants.AFTER_CLOSE_SESSION_SUBSCRIBER )>
-        <Subscriber joinPastSession = component.joinPastSession.bind(component) />
-    </else-if>
+        <if(state.isMedia  && state.widgetInitialized && !state.isDisconnected)>
+            <MediaConnection
+               primaryBackgroundColor = state.primaryBackgroundColor
+               primaryColor = state.primaryColor
+               tracksInitialized = component.tracksInitialized.bind(component)  
+               conferenceInitialized = component.conferenceInitialized.bind(component)  
+               isPublisher = state.isPublisher
+               showToast = component.showToast.bind(component)
+               onMediaControlChange = component.onMediaControlChange.bind(component)
+               closeCurrentSession = component.closeCurrentSession.bind(component)
+               userSelectedMediaOptions = component.userSelectedMediaOptions.bind(component)
+               audioEnabled = state.audioEnabled
+               videoEnabled = state.videoEnabled
+               muteAll = state.muteAll
+               videoWidget = state.videoWidget
+               token = state.token
+            />
+        </if>
 
-    <if(state.isMedia  && state.widgetInitialized && !state.isDisconnected)>
-        <MediaConnection
-           tracksInitialized = component.tracksInitialized.bind(component)  
-           conferenceInitialized = component.conferenceInitialized.bind(component)  
-           isPublisher = state.isPublisher
-           showToast = component.showToast.bind(component)
-           onMediaControlChange = component.onMediaControlChange.bind(component)
-           closeCurrentSession = component.closeCurrentSession.bind(component)
-           userSelectedMediaOptions = component.userSelectedMediaOptions.bind(component)
-           audioEnabled = state.audioEnabled
-           videoEnabled = state.videoEnabled
-           muteAll = state.muteAll
-           videoWidget = state.videoWidget
-           token = state.token
-        />
-    </if>
-
-    <if(state.widgetInitialized && !state.isDisconnected)>
-        <Chat
-           usersList=state.usersList
-           messages=state.messages
-           mobile = mobile
-           isChat = state.isChat
-           setPendingMessages = component.setPendingMessages.bind(component)
-           secondaryButtonAction = component.secondaryButtonAction.bind(component)
-           closeChat = component.closeChat.bind(component)
-           channel = state.channel
-           sessionData = state.sessionData
-        />
-    </if>
-    <PrimaryButton
-       isDisconnected = state.isDisconnected
-       unreadMessage = state.unreadMessage
-       loading = state.loading
-       isMouseDown = state.isMouseDown
-       widgetState = state.widgetState
-       secondaryButtonAction = component.secondaryButtonAction.bind(component)
-       primaryButtonAction = component.primaryButtonAction.bind(component)
-    />
-    <if(state.toast)>
-        <Toast text=state.toastText/>
-    </if>
-</div>
+        <if(state.widgetInitialized && !state.isDisconnected)>
+            <Chat
+               archivedMessageCount = state.archivedMessageCount
+               primaryBackgroundColor = state.primaryBackgroundColor
+               primaryColor = state.primaryColor
+               usersList=state.usersList
+               messages=state.messages
+               mobile = mobile
+               isChat = state.isChat
+               setPendingMessages = component.setPendingMessages.bind(component)
+               secondaryButtonAction = component.secondaryButtonAction.bind(component)
+               closeChat = component.closeChat.bind(component)
+               channel = state.channel
+               sessionData = state.sessionData
+            />
+        </if>
+          <PrimaryButton
+               primaryBackgroundColor = state.primaryBackgroundColor
+               primaryColor = state.primaryColor
+               isDisconnected = state.isDisconnected
+               unreadMessage = state.unreadMessage
+               loading = state.loading
+               isMouseDown = state.isMouseDown
+               widgetState = state.widgetState
+               secondaryButtonAction = component.secondaryButtonAction.bind(component)
+               primaryButtonAction = component.primaryButtonAction.bind(component)
+            />
+        <if(state.toast)>
+            <Toast text=state.toastText/>
+        </if>
+    </div>
+</if>

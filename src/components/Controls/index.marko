@@ -23,14 +23,14 @@ class {
    <if(!component.input.loading)>
      <div class="cb__widgetControls__menu">
        <label class="mdc-elevation--z6 mdc-typography">Invite People</label>
-       <div onClick("invitePeople") class="mdc-fab mdc-fab--mini cb__widgetControls__button">
+       <div style={ color: component.input.primaryColor, backgroundColor: component.input.primaryBackgroundColor} onClick("invitePeople") class="mdc-fab mdc-fab--mini cb__widgetControls__button">
           <div class="mdc-fab__ripple"></div>
           <span class="material-icons mdc-fab__icon"><${person_add}/></span>
        </div>
      </div>
      <div class="cb__widgetControls__menu">
        <label  class="mdc-elevation--z6 mdc-typography">Chat</label>
-       <div onClick(()=>{ component.input.secondaryButtonAction(IS_CHAT)}) class="mdc-fab mdc-fab--mini cb__widgetControls__button">
+       <div style={ color: component.input.primaryColor, backgroundColor: component.input.primaryBackgroundColor} onClick(()=>{ component.input.secondaryButtonAction(IS_CHAT)}) class="mdc-fab mdc-fab--mini cb__widgetControls__button">
            <div class="mdc-fab__ripple"></div>
            <span class="material-icons mdc-fab__icon"><${chat}/></span>
        </div>
@@ -43,7 +43,7 @@ class {
        <else>
           <label class="mdc-elevation--z6 mdc-typography">Start Sharing</label>
        </else>
-       <div onClick(()=>{ component.input.secondaryButtonAction(IS_SCREEN_SHARING)}) class="mdc-fab mdc-fab--mini cb__widgetControls__button">
+       <div style={ color: component.input.primaryColor, backgroundColor: component.input.primaryBackgroundColor} onClick(()=>{ component.input.secondaryButtonAction(IS_SCREEN_SHARING)}) class="mdc-fab mdc-fab--mini cb__widgetControls__button">
            <div class="mdc-fab__ripple"></div>
          <if(component.input.screenSharing)> 
            <span class="material-icons mdc-fab__icon"><${screenSharingOff}/></span>
@@ -61,7 +61,7 @@ class {
        <else>
          <label  class="mdc-elevation--z6 mdc-typography">Start Recording</label>  
        </else>
-       <div onClick(()=>{ component.input.secondaryButtonAction(IS_REOCRDING)}) class="mdc-fab mdc-fab--mini cb__widgetControls__button">
+       <div style={ color: component.input.primaryColor, backgroundColor: component.input.primaryBackgroundColor} onClick(()=>{ component.input.secondaryButtonAction(IS_REOCRDING)}) class="mdc-fab mdc-fab--mini cb__widgetControls__button">
           <div class="mdc-fab__ripple"></div>
           <if(component.input.recording)> 
              <span class="material-icons mdc-fab__icon"><${recordingOff}/></span>

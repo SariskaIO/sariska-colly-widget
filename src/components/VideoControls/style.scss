@@ -9,28 +9,14 @@
 
   &__icon {
     height: 100%;
-    width: 25%;
+    width: 33.3333333%;
     cursor: pointer;
     color: white;
     display: flex;
     justify-content: center;
     align-items: center;
-    svg {
-      fill: #27CED7;
-    }
   }
 
-  &__endCall {
-    svg {
-      fill: red;
-    }
-  }
-
-  &__recordingEnabled {
-    svg {
-      fill: red;
-    }
-  }
 
   &__icon:hover {
     background: #d0caca;

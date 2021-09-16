@@ -50,7 +50,7 @@ class {
 <div.cb__sharableOption>
    <div class="cb__sharableOption__menu">
       <label  class="mdc-elevation--z6">Copy and share URL</label><input.cb__sharableOption__clipboard id="cb__clipboard" type="text" />
-      <div onClick("copyURL", component.input.sessionData) class="mdc-fab mdc-fab--mini cb__sharableOption__button">
+      <div style={ color: component.input.primaryColor, backgroundColor: component.input.primaryBackgroundColor}   onClick("copyURL", component.input.sessionData) class="mdc-fab mdc-fab--mini cb__sharableOption__button">
           <div class="mdc-fab__ripple"></div>
           <span class="material-icons mdc-fab__icon"><${Copy}/></span>
           <if(state.tooltip)>
@@ -61,7 +61,7 @@ class {
    <if(navigator.share)>
       <div class="cb__sharableOption__menu">
         <label class="mdc-elevation--z6 mdc-typography">Share</label>
-        <a onClick("openNativeDrawer", component.input.url) target="_blank" class="mdc-fab mdc-fab--mini cb__sharableOption__button">
+        <a style={ color: component.input.primaryColor, backgroundColor: component.input.primaryBackgroundColor}  onClick("openNativeDrawer", component.input.url) target="_blank" class="mdc-fab mdc-fab--mini cb__sharableOption__button">
         <div class="mdc-fab__ripple"></div>
            <span class="material-icons mdc-fab__icon"><${Share}/></span>
         </a>
@@ -70,21 +70,21 @@ class {
    <else>
        <div class="cb__sharableOption__menu">
           <label class="mdc-elevation--z6 mdc-typography">Share on Email</label>
-          <a onClick("startMedia") href="https://mail.google.com/mail/?view=cm&fs=1&to=&body="+component.input.url target="_blank" class="mdc-fab mdc-fab--mini cb__sharableOption__button">
+          <a style={ color: component.input.primaryColor, backgroundColor: component.input.primaryBackgroundColor}  onClick("startMedia") href="https://mail.google.com/mail/?view=cm&fs=1&to=&body="+component.input.url target="_blank" class="mdc-fab mdc-fab--mini cb__sharableOption__button">
              <div class="mdc-fab__ripple"></div>
              <span class="material-icons mdc-fab__icon"><${Email}/></span>
           </a>
        </div>
        <div class="cb__sharableOption__menu">
            <label  class="mdc-elevation--z6 mdc-typography">Share on whatsapp</label>
-           <a onClick("startMedia") href="https://wa.me/?text="+component.input.url target="_blank" class="mdc-fab mdc-fab--mini cb__sharableOption__button">
+           <a style={ color: component.input.primaryColor, backgroundColor: component.input.primaryBackgroundColor}  onClick("startMedia") href="https://wa.me/?text="+component.input.url target="_blank" class="mdc-fab mdc-fab--mini cb__sharableOption__button">
                 <div class="mdc-fab__ripple"></div>
                 <span class="material-icons mdc-fab__icon"><${Whatsapp}/></span>
            </a>
        </div>
        <div class="cb__sharableOption__menu">
            <label  class="mdc-elevation--z6 mdc-typography">Share on facebook</label>
-           <a onClick("startMedia") href="https://www.facebook.com/sharer.php?u="+component.input.url  target="_blank"  class="mdc-fab mdc-fab--mini cb__sharableOption__button">
+           <a style={ color: component.input.primaryColor, backgroundColor: component.input.primaryBackgroundColor}  onClick("startMedia") href="https://www.facebook.com/sharer.php?u="+component.input.url  target="_blank"  class="mdc-fab mdc-fab--mini cb__sharableOption__button">
                <div class="mdc-fab__ripple"></div>
                <span class="material-icons mdc-fab__icon"><${Facebook}/></span>
            </a>

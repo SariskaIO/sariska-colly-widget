@@ -49,13 +49,13 @@ class {
       this.getEl("file").click();
    }
 }
-<div.cb__upload onClick("onClick") title=component.input.title >
+<div.cb__upload onClick("onClick") style={ color: component.input.primaryColor, backgroundColor: component.input.primaryBackgroundColor}  title=component.input.title >
     <if(state.type === "photos")>
         <${photos}/>
-        <input.cb__upload__input onChange("onChange") accept="image/*" key="file" type="file" >
+        <input.cb__upload__input  style={ color: component.input.primaryColor, backgroundColor: component.input.primaryBackgroundColor}  onChange("onChange") accept="image/*" key="file" type="file" >
     </if>
     <else>
        <${attachment}/>
-       <input.cb__upload__input onChange("onChange") key="file" type="file" >
+       <input.cb__upload__input  style={ color: component.input.primaryColor, backgroundColor: component.input.primaryBackgroundColor}  onChange("onChange") key="file" type="file" >
     </else>
 </div>

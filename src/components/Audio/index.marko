@@ -4,10 +4,6 @@ class {
    onMount() {
       this.input.track.attach(this.getEl("audio"));
    }
-
-   onDestroy() {
-      this.input.track.detach(this.getEl("audio"));
-   }
 }
 
 <audio playsInline="1" autoPlay='1' class="cb__audio" key="audio"/>

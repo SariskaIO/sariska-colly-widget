@@ -21,7 +21,21 @@ class {
    }
 }
 <div.cb__picker>
-    <FileUpload startFileUpload = component.input.startFileUpload type="photos" title="Add Photos" key="uploadFile"  sessionInfo = component.input.sessionInfo />
-    <div.cb__picker__emoji title="Choose an emoji" key="button" onClick("onClick")><${emojis}/></div>
-    <FileUpload startFileUpload = component.input.startFileUpload type="attachment" title="Add Files" key="uploadPhoto"  sessionInfo = component.input.sessionInfo />
+    <FileUpload 
+        color =  component.input.primaryColor
+        primaryBackgroundColor =  component.input.primaryBackgroundColor
+        startFileUpload = component.input.startFileUpload
+        type="photos" 
+        title="Add Photos"
+        key="uploadFile" 
+        sessionInfo = component.input.sessionInfo 
+    />
+    <div.cb__picker__emoji style={color : component.input.primaryColor} title="Choose an emoji" key="button" onClick("onClick")><${emojis}/></div>
+    <FileUpload 
+        color =  component.input.primaryColor
+        primaryBackgroundColor =  component.input.primaryBackgroundColor
+        startFileUpload = component.input.startFileUpload
+        type="attachment"
+        title="Add Files"
+        key="uploadPhoto"  sessionInfo = component.input.sessionInfo />
 </div>

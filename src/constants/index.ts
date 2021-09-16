@@ -37,6 +37,7 @@ export const JOIN_SESSION = "JOIN_SESSION";
 export const MUTE_ALL_TOGGLE = "muteAll";
 export const VIDEO_TOGGLE = "videoEnabled";
 export const WIDGET_TOGGLE = "videoWidget";
+export const FULL_SCREEN_TOGGLE = "fullScreenToggle"
 export const MIC_TOGGLE = "audioEnabled";
 export const CALL_END = "CALL_END";
 export const WIDGET_ACTION = "WIDGET_ACTION";
