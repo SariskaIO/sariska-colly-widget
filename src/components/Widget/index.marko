@@ -288,6 +288,7 @@ class {
          });
 
          this.state.channel.on(ChannelMesssageEvents.ArchivedMessage,  (payload)=> {
+              console.log("payloadpayload", payload);
               const messages =  this.state.messages;
               messages.unshift(payload);
               this.setStateDirty("messages");
@@ -514,6 +515,7 @@ class {
                 return;
             }
             const videoTrack = this.state.localTracks.find(track => track.videoType === "camera");
+
             const [desktopTrack] = await SariskaMediaTransport.createLocalTracks({
                 resolution: 720,
                 devices: ["desktop"],

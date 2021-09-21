@@ -404,7 +404,7 @@ export async function getToken(sessionParams):Promise<string> {
                 moderator: sessionParams.moderator
             },
             sessionId: sessionParams.session_id,
-            apiKey: "27fd6f8080d512442a3694f461adb3986cda5ba39dbe368d75" //window["sariskaConfig"] pick from here
+            apiKey: "279703aabe964548333cc2ea35fcbece728302ae92aa3f892bc8a2" //window["sariskaConfig"] pick from here
         })
     };
 

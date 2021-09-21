@@ -15,6 +15,7 @@ class {
          text: "",
          sessionInfo: input.sessionData,
          scrolling: false,
+         count: 0,
          nameTT: false,
          isChat: false,
          minimizeTT: false,
@@ -78,6 +79,8 @@ class {
   }
 
   fetchMore() {
+    console.log(this.offset, pageSize);
+
     this.state.channel.push(ChannelMesssageEvents.ArchivedMessage, {page: {offset: this.offset, size: pageSize}});
     this.offset = this.offset + pageSize;
   }
@@ -99,7 +102,7 @@ class {
       if ( input.isChat !== this.state.isChat) {
           this.scrollToBottom();
       }
-      this.state.archivedMessageCount = input.archivedMessageCount;
+      this.count = input.archivedMessageCount;
       this.state.isChat = input.isChat;
       this.state.usersList = input.usersList;
       this.setStateDirty("usersList");
