@@ -33,7 +33,8 @@ class {
              loading: false,             
              recordingSession: null,
              sessionData,
-             moderator: true,
+             recordingLoader: false,
+             moderator: false,
              coordinateShift:{},
              desktopTrack: null,
              archivedMessageCount: 0,
@@ -63,12 +64,6 @@ class {
              videoWidget: persistedData.videoWidget===undefined ? true : persistedData.videoWidget,
         }
 
-        if (sessionData.name && sessionData.session_id && !this.state.isDisconnected || persistedData.sessionData && persistedData.sessionData.session_id != sessionData.session_id) {
-           console.log("sesssion joined"); 
-           this.state.widget = true;
-           this.joinSession();
-        }
-
         this.documentClick = this.documentClick.bind(this);
         window.addEventListener("beforeunload", this.beforeReload.bind(this));
         document.addEventListener("keydown", this.documentKeyDown.bind(this), false);
@@ -86,24 +81,26 @@ class {
 
 
         const startRecorder = async ()=> {
-          try  {
-            const urlParams = window.location.pathname.split("/");
-            const sessionId =  urlParams[2];
-            this.state.sessionData.session_id = sessionId;
-            const token = await getToken(this.state.sessionData);
-            this.state.token = token;
-            this.state.widgetInitialized = true;
-            this.state.isMedia = true;
-          } catch(e) {}
+            try  {
+                const urlParams = window.location.pathname.split("/");
+                const sessionId =  urlParams[2];
+                this.state.sessionData.session_id = sessionId;
+                this.state.sessionData.name = "Recorder";
+                const token = await getToken(this.state.sessionData);
+                this.state.token = token;
+                this.state.widget = true;
+                this.state.widgetInitialized = true;
+                this.state.isDisconnected = false;
+                this.state.isMedia = true;           
+            } catch(e) {
+
+            }
         }
 
         if (this.state.iAmRecorder) {
            startRecorder();
         }
 
-        if (this.state.theme) {
-           startRecorder();
-        }
         const Colly = window.Colly;
 
         Colly.setTheme = (theme)=>{
@@ -111,13 +108,21 @@ class {
             this.state.primarBackgroundColor  = theme.primarBackgroundColor;
         }
 
-        Colly.startCall = ()=>{
-            this.joinSession();
+        Colly.startCall = (userInfo)=>{
+          this.state.sessionData.name = userInfo.name;
+          this.state.sessionData.session_id =  userInfo.roomId
+          this.joinSession();
         }
 
         Colly.endCall = ()=>{
             this.closeCurrentSession();
         }
+
+
+        Colly.minimizeWidget = ()=>{
+            this.state.widgetState = Constants.PRIMARY_BUTTON;
+        }
+
 
         Colly.showWidget = ()=>{
             this.state.widget = true;
@@ -134,11 +139,7 @@ class {
         }
 
         Colly.startRecording = ()=>{
-          if (conference && conference.isJoined()) {
-              this.state.prestartRecording = true;
-          } else {
-              this.startRecording();
-          }
+          this.startRecording();
         }
 
       }
@@ -153,7 +154,6 @@ class {
 
       setRole(isModerator) {
           this.state.moderator = isModerator;
-          this.joinSession();
       }
 
       documentKeyDown(event) {
@@ -466,10 +466,12 @@ class {
           conference.on(SariskaMediaTransport.events.conference.RECORDER_STATE_CHANGED, (data) => {
                 console.log("data", data);
                 if (data._status === "on" && data._mode === "file") {
+                    this.state.recordingLoader = false;
                     this.showToast("Recording Started");
                     this.state.recording = true;
                 }
                 if (data._status === "off" && data._mode === "file") {
+                    this.state.recordingLoader = false;
                     this.showToast("Recording Stopped");
                     this.state.recording = false;
                 }
@@ -488,6 +490,11 @@ class {
       }
 
       async startRecording() {
+            if ( !this.state.moderator ) {
+                return;
+            }
+            
+            this.state.recordingLoader = true;
             const appData = {
                 file_recording_metadata : {
                    'share': true
@@ -602,6 +609,7 @@ class {
 
         <else-if( state.widgetState === Constants.PRIMARY_BUTTON_WITH_WIDGET_OPEN )>
             <Controls
+               recordingLoader = state.recordingLoader
                primaryBackgroundColor = state.primaryBackgroundColor
                primaryColor = state.primaryColor
                recording = state.recording

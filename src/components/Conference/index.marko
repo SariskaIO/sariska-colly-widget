@@ -12,7 +12,7 @@ class  {
          recordingSession: null,
          presenterId: null,
          remoteTracks : [],
-         zoomIn: false,
+         zoomIn: true,
          isMouseDown: false,
          coordinateShift: {},
          recordingEnabled: false,
@@ -89,9 +89,9 @@ class  {
        switch(actionKey) {
           case VIDEO_TOGGLE:
              this.state.localTracks.forEach(track=>{
-                if ( track.getType() === "video" ) {
-                   track.isMuted() ? track.unmute(): track.mute();
-                }
+                  if ( track.getType() === "video" ) {
+                     track.isMuted() ? track.unmute(): track.mute();
+                  }
             });
             break;
           case MUTE_ALL_TOGGLE:

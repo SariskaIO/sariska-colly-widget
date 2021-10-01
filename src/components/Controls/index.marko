@@ -63,12 +63,20 @@ class {
        </else>
        <div style={ color: component.input.primaryColor, backgroundColor: component.input.primaryBackgroundColor} onClick(()=>{ component.input.secondaryButtonAction(IS_REOCRDING)}) class="mdc-fab mdc-fab--mini cb__widgetControls__button">
           <div class="mdc-fab__ripple"></div>
-          <if(component.input.recording)> 
-             <span class="material-icons mdc-fab__icon"><${recordingOff}/></span>
+          <if(component.input.recordingLoader)>
+               <span style={width: "inherit"} class="material-icons mdc-fab__icon">
+                  <Loader style={ color: component.input.primaryColor }/>
+               </span>               
           </if>
-          <else>
-            <span class="material-icons mdc-fab__icon"><${recordingOn}/></span>
-         </else>
+         <else>
+            <if(component.input.recording)> 
+               <span class="material-icons mdc-fab__icon"><${recordingOff}/></span>
+            </if>
+            <else>
+               <span class="material-icons mdc-fab__icon"><${recordingOn}/></span>
+            </else>
+         </else>   
+         
     </div>
     </div>
 
