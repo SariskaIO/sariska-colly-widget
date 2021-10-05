@@ -33,6 +33,9 @@ class {
        <div style={ color: component.input.primaryColor, backgroundColor: component.input.primaryBackgroundColor} onClick(()=>{ component.input.secondaryButtonAction(IS_CHAT)}) class="mdc-fab mdc-fab--mini cb__widgetControls__button">
            <div class="mdc-fab__ripple"></div>
            <span class="material-icons mdc-fab__icon"><${chat}/></span>
+           <if(component.input.unreadMessage && !component.input.isDisconnected)>
+            <span.cb__widgetControls__notification>1</span>
+           </if>
        </div>
      </div>
     

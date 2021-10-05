@@ -495,11 +495,16 @@ class {
             }
             
             this.state.recordingLoader = true;
+            let urlParts = `${window.location.origin}${window.location.pathname}`.split("/");    
+            urlParts[5] = "recorder";
+            urlParts = urlParts.join("/");
             const appData = {
+                base_url: urlParts,
                 file_recording_metadata : {
                    'share': true
                 }
             };
+
             const session = await this.state.conference.startRecording({
                 mode: SariskaMediaTransport.constants.recording.mode.FILE,
                 appData: JSON.stringify(appData)
@@ -609,6 +614,8 @@ class {
 
         <else-if( state.widgetState === Constants.PRIMARY_BUTTON_WITH_WIDGET_OPEN )>
             <Controls
+               isDisconnected = state.isDisconnected
+               unreadMessage = state.unreadMessage
                recordingLoader = state.recordingLoader
                primaryBackgroundColor = state.primaryBackgroundColor
                primaryColor = state.primaryColor
