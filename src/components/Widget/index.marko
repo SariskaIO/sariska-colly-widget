@@ -8,8 +8,7 @@ import { getQueryStringValue,
     skipToolbox ,
     getToken,
     getRandomColor,
-    getMeetingId,
-    getQueryStringValue} from "../../utils";
+    getMeetingId} from "../../utils";
 import * as Constants from "../../constants";
 import { setL, getL, removeL } from "../../utils/local-storage";
 import { set, get } from "../../utils/session-storage";
@@ -283,7 +282,7 @@ class {
               messages.push(payload);
               this.setStateDirty("messages");
               if (!this.state.isChat) {
-                this.setPendingMessages();
+                this.state.isChat = true;
               }
          });
 
@@ -497,6 +496,7 @@ class {
             this.state.recordingLoader = true;
             let urlParts = `${window.location.origin}${window.location.pathname}`.split("/");    
             urlParts[5] = "recorder";
+            urlParts[6] = "Candidate";
             urlParts = urlParts.join("/");
             const appData = {
                 base_url: urlParts,
@@ -553,6 +553,7 @@ class {
             this.state.conference.setLocalParticipantProperty("presenting", "start");
             this.state.desktopTrack = desktopTrack;
             this.state.screenSharing = true;
+            this.showToast("Screen sharing is started");
        }
 
        async stopScreenSharing() {
@@ -565,6 +566,7 @@ class {
             await this.state.desktopTrack.dispose();
             this.state.desktopTrack = null;
             this.state.screenSharing = false;
+            this.showToast("Screen sharing is stopped");
        }
 
        beforeReload() {
@@ -657,6 +659,7 @@ class {
 
         <if(state.isMedia  && state.widgetInitialized && !state.isDisconnected)>
             <MediaConnection
+               usersList=state.usersList
                primaryBackgroundColor = state.primaryBackgroundColor
                primaryColor = state.primaryColor
                tracksInitialized = component.tracksInitialized.bind(component)  

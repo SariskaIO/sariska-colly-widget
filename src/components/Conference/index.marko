@@ -11,7 +11,8 @@ class  {
          conference: null,
          recordingSession: null,
          presenterId: null,
-         remoteTracks : [],
+         remoteTracks : {},
+         audioLevel:{},
          zoomIn: true,
          isMouseDown: false,
          coordinateShift: {},
@@ -24,6 +25,10 @@ class  {
       conference.on(SariskaMediaTransport.events.conference.TRACK_ADDED, removeTrackAdded.bind(this));
       conference.on(SariskaMediaTransport.events.conference.TRACK_REMOVED, remoteTrackRemoved.bind(this));
       conference.on(SariskaMediaTransport.events.conference.TRACK_MUTE_CHANGED, onTrackMuteChanged.bind(this));
+      conference.on(SariskaMediaTransport.events.conference.TRACK_AUDIO_LEVEL_CHANGED, (participantId, audioLevel) => {
+         this.state.audioLevel[participantId] = audioLevel;
+         this.setStateDirty("audioLevel");
+      });
       conference.on(SariskaMediaTransport.events.conference.CONFERENCE_JOINED, ()=>{
         conference.getParticipants().forEach(item=>{
             if (item._properties && item._properties.hasOwnProperty("recording")) {
@@ -62,7 +67,13 @@ class  {
       setupLocalStream();
 
       function remoteTrackRemoved(track) {
-         this.state.remoteTracks = this.state.remoteTracks.filter(item=>item.track.id!==track.track.id);
+         const participantId = track.getParticipantId();
+         if (participantId) {
+            this.state.remoteTracks[participantId] = this.state.remoteTracks[participantId].filter((item) => item.getId() !== track.getId());
+         }
+         if (this.state.remoteTracks[participantId] && this.state.remoteTracks[participantId].length === 0) {
+            delete this.state.remoteTracks[participantId];
+         }
          this.setStateDirty("remoteTracks");
       }
 
@@ -70,14 +81,18 @@ class  {
          if (!track  || track.isLocal()) {
              return;
          }
-         
-         console.log("remote track added", track);
-
-         this.state.remoteTracks.push(track);
+         const participantId = track.getParticipantId();
+         if (!this.state.remoteTracks[participantId]) {
+            this.state.remoteTracks[participantId] = [];
+         }
+         this.state.remoteTracks[participantId].push(track);
          this.setStateDirty("remoteTracks");
       }
 
       function onTrackMuteChanged() {
+
+            console.log("track mute changed!!!!");
+
           this.setStateDirty("remoteTracks");
       }
 
@@ -95,17 +110,17 @@ class  {
             });
             break;
           case MUTE_ALL_TOGGLE:
-             this.state.conference.getParticipants().forEach(participant=>{
-                 this.state.conference.muteParticipant(participant.getJid(), value);
+             this.state.conference.getParticipantsWithoutHidden().forEach(participant=>{
+                 this.state.conference.muteParticipant(participant._id, "audio");
              });
              break;
           case MIC_TOGGLE:
-             this.state.localTracks.forEach(track=>{
+            this.state.localTracks.forEach(track=>{
                 if (track.getType()==="audio") {
                    track.isMuted() ? track.unmute(): track.mute();
                 }
-             });
-             break;
+            });
+            break;
           case FULL_SCREEN_TOGGLE:
              this.state.zoomIn = !this.state.zoomIn;
              break;
@@ -159,6 +174,7 @@ class  {
 
 <div id="cb--media-container"  onMouseUp("mouseUp") onMouseDown("mouseDown") key="mediaWidget"  class=["cb__mediaContainer", "mdc-elevation--z6"]>
    <VideoControls 
+        isPresenting=state.presenterId
         primaryColor = component.input.primaryColor
         primaryBackgroundColor = component.input.primaryBackgroundColor 
         recordingEnabled = state.recordingEnabled 
@@ -169,9 +185,13 @@ class  {
         videoEnabled=component.input.videoEnabled  
         muteAll=component.input.muteAll 
         videoWidget=component.input.videoWidget 
+        zoomIn = state.zoomIn
    />
    <div class=["cb__mediaContainer__widget"]>
+      <if(component.input.videoWidget)>
          <LocalStream 
+              audioLevel = state.audioLevel
+              usersList = component.input.usersList
               primaryBackgroundColor = component.input.primaryBackgroundColor
               primaryColor = component.input.primaryColor
               videoEnabled=component.input.videoEnabled  
@@ -182,6 +202,8 @@ class  {
               conference = state.conference
           />
           <RemoteStream
+              audioLevel = state.audioLevel
+              usersList = component.input.usersList
               zoomIn = state.zoomIn
               primaryBackgroundColor = component.input.primaryBackgroundColor
               primaryColor = component.input.primaryColor
@@ -191,18 +213,18 @@ class  {
               videoControlAction = component.videoControlAction.bind(component) 
               conference = state.conference 
           />
-
-          <if(state.zoomIn)>
-             <for|track, index| of=state.remoteTracks>
-                  <if (track.getParticipantId() === state.presenterId && track.getType() === "video")>
-                      <LargeVideo
-                          key=track.track.id
-                          isSharing = true 
-                          user={} 
-                          track=track
-                      />
-                  </if>
-             </for>
-         </if>
+      </if>
+      <if(state.zoomIn)>
+         <for|participantId, index| of=Object.keys(state.remoteTracks)>
+            <if (participantId === state.presenterId && state.remoteTracks[participantId][1].getType() === "video")>
+                  <LargeVideo
+                     key=state.remoteTracks[participantId][1].track.id
+                     isSharing = true 
+                     user={} 
+                     track=state.remoteTracks[participantId][1]
+                  />
+            </if>
+         </for>
+      </if>
    </div>
 </div>

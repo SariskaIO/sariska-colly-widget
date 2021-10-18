@@ -1,22 +1,24 @@
-import SariskaMediaTransport from "sariska-media-transport";
 import { getUser } from "../../utils";
 
 
-<for|track, index| of=component.input.remoteTracks>
-   <div.cb__mediaContainer__item>
-      <if (track.isVideoTrack() && component.input.videoWidget)>
-            <Video
-               zoomIn = component.input.zoomIn
-               primaryColor = component.input.primaryColor
-               primaryBackgroundColor = component.input.primaryBackgroundColor
-               isPresenting=(component.input.presenterId === track.getParticipantId())
-               videoControlAction=component.input.videoControlAction
-               user=getUser(track, component.input.conference)
-               key=track.track.id track=track 
-            />
+<for|participantId, index| of=Object.keys(component.input.remoteTracks)>
+   <div.cb__mediaContainer__remote>
+      <if(component.input.remoteTracks[participantId][0])>
+         <Audio key=component.input.remoteTracks[participantId][0].track.id track=component.input.remoteTracks[participantId][0] />
       </if>
-      <else>
-            <Audio key=track.track.id track=track />
-      </else>
+      <if(component.input.remoteTracks[participantId][1])>
+         <Video
+            audioLevel = component.input.audioLevel[participantId]
+            color = (component.input.usersList.find(item=>item.id === participantId) || {}).color
+            zoomIn = component.input.zoomIn
+            primaryColor = component.input.primaryColor
+            primaryBackgroundColor = component.input.primaryBackgroundColor
+            isPresenting=(component.input.presenterId === participantId)
+            videoControlAction=component.input.videoControlAction
+            user=getUser(component.input.remoteTracks[participantId][1], component.input.conference)
+            key=component.input.remoteTracks[participantId][1].track.id
+            track=component.input.remoteTracks[participantId][1] 
+         />
+      </if>
    </div>
 </for>

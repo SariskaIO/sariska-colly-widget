@@ -9,6 +9,7 @@ import { getURL, updateQueryStringParameter } from "../../utils";
 class {
   onCreate(input) {
      this.state = {
+       url: `https://code.interviewvector.com/login/${input.sessionData.session_id}?user=guest`, 
        tooltip:  false
      };
   }
@@ -24,7 +25,7 @@ class {
      if (navigator.share) {
          navigator.share({
                title: "Share",
-               url: url
+               url: this.state.url
          }).then(() => {
          })
          .catch(err => {
@@ -34,8 +35,7 @@ class {
 
   copyURL(sessionData) {
      const element  =  this.el.querySelector('#cb__clipboard');
-     let url  = window.location.href;
-     element.setAttribute("value", url);
+     element.setAttribute("value", this.state.url);
      element.select();
      document.execCommand('copy');
      this.startTooltip();
@@ -70,24 +70,10 @@ class {
    <else>
        <div class="cb__sharableOption__menu">
           <label class="mdc-elevation--z6 mdc-typography">Share on Email</label>
-          <a style={ color: component.input.primaryColor, backgroundColor: component.input.primaryBackgroundColor}  onClick("startMedia") href="https://mail.google.com/mail/?view=cm&fs=1&to=&body="+component.input.url target="_blank" class="mdc-fab mdc-fab--mini cb__sharableOption__button">
+          <a style={ color: component.input.primaryColor, backgroundColor: component.input.primaryBackgroundColor}  onClick("startMedia") href="https://mail.google.com/mail/?view=cm&fs=1&to=&body="+state.url target="_blank" class="mdc-fab mdc-fab--mini cb__sharableOption__button">
              <div class="mdc-fab__ripple"></div>
              <span class="material-icons mdc-fab__icon"><${Email}/></span>
           </a>
-       </div>
-       <div class="cb__sharableOption__menu">
-           <label  class="mdc-elevation--z6 mdc-typography">Share on whatsapp</label>
-           <a style={ color: component.input.primaryColor, backgroundColor: component.input.primaryBackgroundColor}  onClick("startMedia") href="https://wa.me/?text="+component.input.url target="_blank" class="mdc-fab mdc-fab--mini cb__sharableOption__button">
-                <div class="mdc-fab__ripple"></div>
-                <span class="material-icons mdc-fab__icon"><${Whatsapp}/></span>
-           </a>
-       </div>
-       <div class="cb__sharableOption__menu">
-           <label  class="mdc-elevation--z6 mdc-typography">Share on facebook</label>
-           <a style={ color: component.input.primaryColor, backgroundColor: component.input.primaryBackgroundColor}  onClick("startMedia") href="https://www.facebook.com/sharer.php?u="+component.input.url  target="_blank"  class="mdc-fab mdc-fab--mini cb__sharableOption__button">
-               <div class="mdc-fab__ripple"></div>
-               <span class="material-icons mdc-fab__icon"><${Facebook}/></span>
-           </a>
        </div>
    </else>
 </div>

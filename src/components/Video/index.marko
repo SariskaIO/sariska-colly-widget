@@ -5,7 +5,7 @@ import screen_sharing from "../Icons/screen_sharing.marko";
 import full_screen from "../Icons/fullscreen.marko";
 import full_screen_exit from "../Icons/fullscreen_exit.marko";
 import { MIC_TOGGLE, FULL_SCREEN_TOGGLE } from "../../constants";
-import { getDimensions } from  "../../utils";
+import { getDimensions , videoShadow} from  "../../utils";
 
 import './index.scss';
 
@@ -14,10 +14,13 @@ class {
        this.state = {
           showTT: false
        }
+       console.log('input', input);
    }
    
    onMount() {
-      this.input.track.attach(this.getEl("video"));
+      if (this.getEl("video")) {
+         this.input.track.attach(this.getEl("video"));
+      }
    }
 
    mouseOut() {
@@ -34,13 +37,16 @@ class {
 }
 
 
-<div.cb__video>
-   <video playsInline="1" autoPlay='1' key="video"/>
+<div.cb__video style={background: component.input.track.isMuted() ? "#202124": ""}>
+   <if(component.input.track.isMuted())>
+      <div style={boxShadow: videoShadow(component.input.audioLevel), background: component.input.color, color: "white" } class="cb__video__thumbnail">${component.input.user.name && component.input.user.name[0]}</div>
+   </if>
+   <video style={ display: component.input.track.isMuted() ? "none" : "block" } playsInline="1" autoPlay='1' key="video"/>
    <if(component.input.track.isLocal()) >
        <div class="cb__video__name">You</div>
    </if>
    <else>
-       <div class="cb__video__name">${component.input.user.name}</div>
+       <div class="cb__video__name">${component.input.user.name}</div> 
    </else>
 
    <if(component.input.track.isLocal())>
@@ -54,24 +60,6 @@ class {
          <Tooltip  style={top:"61px", right: "-40px"},  text=component.input.track.isMuted() ? "Stop My Audio" : "Start My Audio"/>
       </if>
    </if>
-
-   <if(component.input.track.isMuted() || (component.input.track.isLocal() && !component.input.videoEnabled))>
-      <div class="cb__video__thumbnail">${component.input.user.name && component.input.user.name[0]}</div>
-   </if>
-
-   <if(component.input.isPresenting)>
-       <if(component.input.zoomIn)>
-          <span.cb__video__zoomIcon 
-             style={ color: component.input.primaryColor } 
-             onClick("onClick", FULL_SCREEN_TOGGLE)><${full_screen_exit}/></span>
-       </if>
-       <else>
-          <span.cb__video__zoomIcon 
-          style={ color: component.input.primaryColor } 
-          onClick("onClick", FULL_SCREEN_TOGGLE)><${full_screen}/></span>
-       </else>
-   </if>
-
    <if(component.input.isPresenting)>
       <span.cb__video__screenSharing><${screen_sharing}/></span>
    </if>

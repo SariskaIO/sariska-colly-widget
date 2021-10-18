@@ -1,4 +1,4 @@
-import { MUTE_ALL_TOGGLE, VIDEO_TOGGLE, WIDGET_TOGGLE, CALL_END, RECORDING_TOGGLE } from "../../constants";
+import { MUTE_ALL_TOGGLE, VIDEO_TOGGLE, WIDGET_TOGGLE, CALL_END, RECORDING_TOGGLE , FULL_SCREEN_TOGGLE} from "../../constants";
 import volume_up from "../Icons/volume_up.marko";
 import volume_off from "../Icons/volume_off.marko";
 import videocam from "../Icons/videocam.marko";
@@ -8,6 +8,8 @@ import maximize from "../Icons/maximize.marko";
 import call_end from "../Icons/call_end.marko";
 import recording_on from "../Icons/recording_on.marko";
 import recording_off from "../Icons/recording_off.marko";
+import full_screen from "../Icons/fullscreen.marko";
+import full_screen_exit from "../Icons/fullscreen_exit.marko";
 
 class {
     onCreate(input) {
@@ -17,6 +19,7 @@ class {
            minimizeTT: false,
            callTT: false,
            call: false,
+           screenShareTT: false,
            recordingTT: false
         }
     }
@@ -79,4 +82,24 @@ class {
            <Tooltip  style={top:"-31px"},  text = component.input.videoWidget ? "Minimize" : "Maximize"/>
         </if>
     </div>
+    <if(component.input.isPresenting)>
+        <div style={backgroundColor: component.input.primaryBackgroundColor} class="cb__videoControls__icon" onClick("onClick", FULL_SCREEN_TOGGLE) onMouseOut("mouseOut", "screenShareTT") onMouseEnter("mouseEnter", "screenShareTT")>
+            <div style={ color: component.input.primaryColor, backgroundColor: component.input.primaryBackgroundColor}  class="material-icons mdc-fab__icon">
+                <if(component.input.zoomIn)>
+                    <${full_screen_exit}/>
+                </if>
+                <else>
+                    <${full_screen}/>
+                </else>
+            </div>
+            <if(state.screenShareTT)>
+               <if(component.input.zoomIn)>
+                    <Tooltip  style={top:"-31px", width: "165px"},  text = "Minimize Screen sharing" />
+               </if>
+               <else>
+                    <Tooltip  style={top:"-31px", width: "168px"},  text =  "Maximize Screen sharing" />
+               </else>
+            </if>
+        </div>
+   </if>
 </div>

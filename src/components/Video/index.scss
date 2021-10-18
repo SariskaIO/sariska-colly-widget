@@ -1,6 +1,6 @@
 .cb__video {
   height: 123px !important;
-  width: 218px !important;
+  width: 220px !important;
   position: relative;
   &__name {
     color: white;
@@ -15,7 +15,7 @@
     position: absolute;
     right: 6px;
     bottom: 3px;
-    fill: #123fbc;
+    fill: white;
      svg {
        height: 24px;
        width: 24px;
@@ -43,7 +43,7 @@
     z-index: 9;
     cursor: pointer;
     svg {
-      fill: #123fbc;
+      fill:white;
     }
   }
 
@@ -55,19 +55,24 @@
   }
 
   &__thumbnail {
-
-    position: absolute;
-    text-align: center;
     top: 0;
-    left: -1px;
+    left: 0;
+    background: grey;
     font-size: 40px;
-    color: green;
-    background: #263238;
-    bottom: -1px;
-    right: -2px;
+    bottom: 0;
+    right: 0;
     display: flex;
     align-items: center;
     justify-content: center;
+    width: 60px;
+    height: 60px;
+    border-radius: 60px;
+    margin: auto;
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
   }
 
   video {

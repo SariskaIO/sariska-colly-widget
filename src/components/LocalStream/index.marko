@@ -1,9 +1,9 @@
-import SariskaMediaTransport from "sariska-media-transport";
-
-
+<div.cb__mediaContainer__local style={borderBottom: component.input.conference.getParticipantCount()  > 1 ? "2px solid white;" : "" } >
 <for|track, index| of=component.input.localTracks>
    <if(track.isVideoTrack() && component.input.videoWidget)>
        <Video 
+            audioLevel = component.input.audioLevel[component.input.conference.myUserId()]
+            color = (component.input.usersList.find(item=>item.id === component.input.conference.myUserId()) || {}).color
             primaryBackgroundColor = component.input.primaryBackgroundColor
             primaryColor = component.input.primaryColor
             videoEnabled=component.input.videoEnabled
@@ -15,3 +15,4 @@ import SariskaMediaTransport from "sariska-media-transport";
        />
    </if>
 </for>
+</div>

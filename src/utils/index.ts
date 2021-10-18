@@ -490,3 +490,31 @@ export function getMeetingId() {
     const strArr = str.match(/.{3}/g);
     return strArr.join("-");
 }
+
+export function videoShadow(level) {
+    const scale = 2;
+
+    // Internal circle audio level.
+    const int = {
+        level: level > 0.15 ? 10 : 0,
+        color: "rgba(255,255,255,0.4)"
+    };
+
+    // External circle audio level.
+    const ext = {
+        level: parseFloat(
+            ((int.level * scale * level) + int.level).toFixed(0)),
+        color: "rgba(255,255,255,0.2)"
+    };
+
+    // Internal blur.
+    int["blur"] = int.level ? 1 : 0;
+
+    // External blur.
+    ext["blur"] = ext.level ? 3 : 0;
+
+    return [
+        `0 0 ${int["blur"]}px ${int.level}px ${int.color}`,
+        `0 0 ${ext["blur"]}px ${ext.level}px ${ext.color}`
+    ].join(', ');
+}
