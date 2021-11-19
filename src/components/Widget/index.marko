@@ -6,6 +6,7 @@ import { getQueryStringValue,
     isMobile,
     getDimensions,
     skipToolbox ,
+    getQueryParams,
     getToken,
     getRandomColor,
     getMeetingId} from "../../utils";
@@ -84,7 +85,7 @@ class {
                 const urlParams = window.location.pathname.split("/");
                 const sessionId =  urlParams[2];
                 this.state.sessionData.session_id = sessionId;
-                this.state.sessionData.name = "Recorder";
+                this.state.sessionData.name = "recorder";
                 const token = await getToken(this.state.sessionData);
                 this.state.token = token;
                 this.state.widget = true;
@@ -139,6 +140,11 @@ class {
 
         Colly.startRecording = ()=>{
           this.startRecording();
+        }
+
+
+        Colly.stopRecording = ()=>{
+          this.stopRecording();
         }
 
       }
@@ -494,12 +500,9 @@ class {
             }
             
             this.state.recordingLoader = true;
-            let urlParts = `${window.location.origin}${window.location.pathname}`.split("/");    
-            urlParts[5] = "recorder";
-            urlParts[6] = "Candidate";
-            urlParts = urlParts.join("/");
+            let urlToRecord = `${window.location.origin}${window.location.pathname}?name=recorder&type=candidate&color=C41E3A`;   
             const appData = {
-                base_url: urlParts,
+                base_url: urlToRecord,
                 file_recording_metadata : {
                    'share': true
                 }

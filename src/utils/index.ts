@@ -206,13 +206,25 @@ export function getRandomColor() {
     return color;
 }
 
+export function getQueryParams() {
+    var q = {};
+    if (!location.href.split('?')[1]) {
+        return {};
+    }
+    location.href.split('?')[1].split('&').forEach(function(i){
+        q[i.split('=')[0]]=i.split('=')[1];
+    });
+    return q;
+}
+
 export function syncWithParams(params) {
+    const queryParams = getQueryParams();
 
     const urlParams = window.location.pathname.split("/");
 
     const sessionId =  urlParams[2];
 
-    const guestName =  urlParams[3];
+    const guestName =  queryParams["name"];
 
     if (sessionId) {
         params["name"] = guestName;
