@@ -21,7 +21,7 @@ class  {
       }
 
       this.mouseMoveRef = this.mouseMove.bind(this);
-      const conference = connection.initJitsiConference({ startAudioMuted: !input.audioEnabled, startVideoMuted: !input.videoEnabled });
+      const conference = connection.initJitsiConference({startAudioMuted: !input.audioEnabled, startVideoMuted: !input.videoEnabled});
       conference.on(SariskaMediaTransport.events.conference.TRACK_ADDED, removeTrackAdded.bind(this));
       conference.on(SariskaMediaTransport.events.conference.TRACK_REMOVED, remoteTrackRemoved.bind(this));
       conference.on(SariskaMediaTransport.events.conference.TRACK_MUTE_CHANGED, onTrackMuteChanged.bind(this));
@@ -58,8 +58,13 @@ class  {
 
       const setupLocalStream = async ()=> {
          const tracks = await SariskaMediaTransport.createLocalTracks({devices:["audio", "video"], resolution: "180"});
-         tracks.forEach(item=>conference.addTrack(item));
          this.state.localTracks = tracks;
+         
+         const [ audioTrack, videoTrack] = tracks;
+
+         await conference.addTrack(audioTrack);
+         await conference.addTrack(videoTrack);
+
          input.tracksInitialized(tracks);
          this.setStateDirty("localTracks");
       }
@@ -98,32 +103,21 @@ class  {
 
    async videoControlAction(actionKey, value) {
        this.input.onMediaControlChange(actionKey, value);
+       const [audioTrack, videoTrack] = this.state.localTracks; 
        switch(actionKey) {
           case VIDEO_TOGGLE:
-             this.state.localTracks.forEach(track=>{
-                  if ( track.getType() === "video" ) {
-                     track.isMuted() ? track.unmute(): track.mute();
-                  }
-            });
-            break;
-          case MUTE_ALL_TOGGLE:
-             this.state.conference.getParticipantsWithoutHidden().forEach(participant=>{
-                 this.state.conference.muteParticipant(participant._id, "audio");
-             });
+             videoTrack.isMuted() ? videoTrack.unmute(): videoTrack.mute();
              break;
           case MIC_TOGGLE:
-            this.state.localTracks.forEach(track=>{
-                if (track.getType()==="audio") {
-                   track.isMuted() ? track.unmute(): track.mute();
-                }
-            });
-            break;
+             audioTrack.isMuted() ? audioTrack.unmute(): audioTrack.mute();
+             break;
           case FULL_SCREEN_TOGGLE:
              this.state.zoomIn = !this.state.zoomIn;
              break;
           default:
-            console.log("hi")
+             console.log("hi")
        }
+       this.setStateDirty("localTracks");
    }
 
    mouseUp() {
@@ -211,6 +205,13 @@ class  {
               conference = state.conference 
           />
       </if>
+
+      <for|participantId, index| of=Object.keys(state.remoteTracks)>
+         <if(state.remoteTracks[participantId][0])>
+            <Audio key=state.remoteTracks[participantId][0].track.id track=state.remoteTracks[participantId][0] />
+         </if>
+      </for>
+
       <if(state.zoomIn)>
          <for|participantId, index| of=Object.keys(state.remoteTracks)>
             <if (participantId === state.presenterId && state.remoteTracks[participantId][1].getType() === "video")>

@@ -25,7 +25,9 @@ export function setL(key, value) {
         try {
             const data = JSON.stringify(value);
             window.localStorage.setItem(key, data);
-        } catch (e) {}
+        } catch (e) {
+            console.log("failed to set", e);
+        }
     }
 }
 

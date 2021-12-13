@@ -79,8 +79,6 @@ class {
   }
 
   fetchMore() {
-    console.log(this.offset, pageSize);
-
     this.state.channel.push(ChannelMesssageEvents.ArchivedMessage, {page: {offset: this.offset, size: pageSize}});
     this.offset = this.offset + pageSize;
   }

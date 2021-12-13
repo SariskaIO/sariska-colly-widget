@@ -43,32 +43,6 @@ class {
 }
 
 <div class="cb__videoControls mdc-elevation--z6">
-    <div style={backgroundColor: component.input.primaryBackgroundColor} class="cb__videoControls__icon" onClick("onClick", MUTE_ALL_TOGGLE, component.input.muteAll)  onMouseOut("mouseOut", "volumeTT") onMouseEnter("mouseEnter", "volumeTT")>
-        <div style={ color: component.input.primaryColor } class="material-icons mdc-fab__icon">
-            <if(component.input.muteAll)>
-                 <${volume_off}/>
-            </if>
-            <else>
-               <${volume_up}/>
-            </else>
-        </div>
-        <if(state.volumeTT)>
-           <Tooltip style={top:"-31px", width: "60px"},  text = component.input.muteAll ? "Unmute" : "Mute All" />
-        </if>
-    </div>
-    <div style={backgroundColor: component.input.primaryBackgroundColor} class="cb__videoControls__icon" onClick("onClick", VIDEO_TOGGLE, component.input.videoEnabled) onMouseOut("mouseOut", "webcamTT") onMouseEnter("mouseEnter", "webcamTT")>
-        <div style={ color: component.input.primaryColor, backgroundColor: component.input.primaryBackgroundColor}  class="material-icons mdc-fab__icon">
-            <if(component.input.videoEnabled)>
-                <${videocam}/>
-            </if>
-            <else>
-                <${videocam_off}/>
-            </else>
-        </div>
-        <if(state.webcamTT)>
-            <Tooltip style={top:"-31px"},  text = component.input.videoEnabled ? "Stop Video" : "Start Video" />
-        </if>
-    </div>
     <div  style={backgroundColor: component.input.primaryBackgroundColor} class="cb__videoControls__icon" onClick("onClick", WIDGET_TOGGLE, component.input.videoWidget) onMouseOut("mouseOut", "minimizeTT") onMouseEnter("mouseEnter", "minimizeTT")>
         <div style={ color: component.input.primaryColor, backgroundColor: component.input.primaryBackgroundColor}  class="material-icons mdc-fab__icon">
             <if(component.input.videoWidget)>

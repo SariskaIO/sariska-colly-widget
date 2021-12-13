@@ -3,10 +3,7 @@ import { getUser } from "../../utils";
 
 <for|participantId, index| of=Object.keys(component.input.remoteTracks)>
    <div.cb__mediaContainer__remote>
-      <if(component.input.remoteTracks[participantId][0])>
-         <Audio key=component.input.remoteTracks[participantId][0].track.id track=component.input.remoteTracks[participantId][0] />
-      </if>
-      <if(component.input.remoteTracks[participantId][1])>
+      <if( component.input.remoteTracks[participantId][1])>
          <Video
             audioLevel = component.input.audioLevel[participantId]
             color = (component.input.usersList.find(item=>item.id === participantId) || {}).color
@@ -16,9 +13,9 @@ import { getUser } from "../../utils";
             isPresenting=(component.input.presenterId === participantId)
             videoControlAction=component.input.videoControlAction
             user=getUser(component.input.remoteTracks[participantId][1], component.input.conference)
-            key=component.input.remoteTracks[participantId][1].track.id
-            track=component.input.remoteTracks[participantId][1] 
+            key=participantId
+            tracks=component.input.remoteTracks[participantId]
          />
-      </if>
+      </if>   
    </div>
 </for>

@@ -15,6 +15,7 @@ class {
       this.createConnection(input.token);
    }
 
+
    async createConnection(token) {
       const conn = new SariskaMediaTransport.JitsiConnection(token);
       conn.addEventListener(SariskaMediaTransport.events.connection.CONNECTION_ESTABLISHED, onConnectionSuccess.bind(this));

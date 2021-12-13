@@ -585,7 +585,7 @@ class {
                 muteAll: this.state.muteAll,
                 videoWidget: this.state.videoWidget
             }
-            setL("cb__toolboxOptions", data);
+            localStorage.setItem("cb__toolboxOptions", JSON.stringify(data));
       }
 
       onDestroy() {

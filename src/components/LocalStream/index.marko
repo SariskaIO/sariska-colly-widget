@@ -1,6 +1,6 @@
 <div.cb__mediaContainer__local style={borderBottom: component.input.conference.getParticipantCount()  > 1 ? "2px solid white;" : "" } >
 <for|track, index| of=component.input.localTracks>
-   <if(track.isVideoTrack() && component.input.videoWidget)>
+   <if(track.isVideoTrack())>
        <Video 
             audioLevel = component.input.audioLevel[component.input.conference.myUserId()]
             color = (component.input.usersList.find(item=>item.id === component.input.conference.myUserId()) || {}).color
@@ -11,7 +11,7 @@
             audioEnabled=component.input.audioEnabled
             user = component.input.conference.getLocalUser()
             key=track.track.id
-            track=track
+            tracks=component.input.localTracks
        />
    </if>
 </for>

@@ -35,7 +35,8 @@
   }
 
 
-  &__mic {
+
+  &__videoMicContainer {
     cursor: pointer;
     position: absolute;
     bottom: 0;
@@ -44,6 +45,9 @@
     cursor: pointer;
     svg {
       fill:white;
+    }
+    span {
+      margin-right: 10px;
     }
   }
 

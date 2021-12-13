@@ -4,8 +4,10 @@ import mic_off from "../Icons/mic_off.marko";
 import screen_sharing from "../Icons/screen_sharing.marko";
 import full_screen from "../Icons/fullscreen.marko";
 import full_screen_exit from "../Icons/fullscreen_exit.marko";
-import { MIC_TOGGLE, FULL_SCREEN_TOGGLE } from "../../constants";
+import { MIC_TOGGLE, FULL_SCREEN_TOGGLE,VIDEO_TOGGLE } from "../../constants";
 import { getDimensions , videoShadow} from  "../../utils";
+import videocam from "../Icons/videocam.marko";
+import videocam_off from "../Icons/videocam_off.marko";
 
 import './index.scss';
 
@@ -19,7 +21,7 @@ class {
    
    onMount() {
       if (this.getEl("video")) {
-         this.input.track.attach(this.getEl("video"));
+         this.input.tracks[1].attach(this.getEl("video"));
       }
    }
 
@@ -31,37 +33,44 @@ class {
       this.state.showTT  = true;
    }
 
-   onClick(param, value) {
+   onClick(param, value, isLocal) {
+      if (!isLocal) {
+         return;
+      }
       this.input.videoControlAction(param, !value);
    }
 }
 
 
-<div.cb__video style={background: component.input.track.isMuted() ? "#202124": ""}>
-   <if(component.input.track.isMuted())>
+<div.cb__video style={background: (component.input.tracks[1] && component.input.tracks[1].isMuted())  ? "#202124": ""}>
+   <if(component.input.tracks[1].isMuted())>
       <div style={boxShadow: videoShadow(component.input.audioLevel), background: component.input.color, color: "white" } class="cb__video__thumbnail">${component.input.user.name && component.input.user.name[0]}</div>
    </if>
-   <video style={ display: component.input.track.isMuted() ? "none" : "block" } playsInline="1" autoPlay='1' key="video"/>
-   <if(component.input.track.isLocal()) >
+   <video style={ display: component.input.tracks[1] && component.input.tracks[1].isMuted() ? "none" : "block" } playsInline="1" autoPlay='1' key="video"/>
+
+   <if(component.input.tracks[1].isLocal()) >
        <div class="cb__video__name">You</div>
    </if>
    <else>
        <div class="cb__video__name">${component.input.user.name}</div> 
    </else>
 
-   <if(component.input.track.isLocal())>
-      <if(component.input.audioEnabled)>
-         <span onMouseOut("mouseOut") onMouseEnter("mouseEnter") onClick("onClick", MIC_TOGGLE, component.input.audioEnabled)  class="cb__video__mic" style={ color: component.input.primaryColor }  ><${mic}/></span>
+   <div class="cb__video__videoMicContainer">
+      <if(component.input.tracks[0].isMuted())>
+         <span onMouseOut("mouseOut") onMouseEnter("mouseEnter") onClick("onClick", MIC_TOGGLE, false, component.input.tracks[0].isLocal())  style={ color: component.input.primaryColor }   ><${mic_off}/></span>
       </if>
       <else>
-         <span onMouseOut("mouseOut") onMouseEnter("mouseEnter") onClick("onClick", MIC_TOGGLE, component.input.audioEnabled) class="cb__video__mic" style={ color: component.input.primaryColor }   ><${mic_off}/></span>
+         <span onMouseOut("mouseOut") onMouseEnter("mouseEnter") onClick("onClick", MIC_TOGGLE, true, component.input.tracks[0].isLocal())   style={ color: component.input.primaryColor }  ><${mic}/></span>
       </else>
-      <if(state.showTT)>
-         <Tooltip  style={top:"61px", right: "-40px"},  text=component.input.track.isMuted() ? "Stop My Audio" : "Start My Audio"/>
+      
+      <if(component.input.tracks[1].isMuted())>
+         <span onMouseOut("mouseOut") onMouseEnter("mouseEnter") onClick("onClick", VIDEO_TOGGLE, false, component.input.tracks[1].isLocal())  style={ color: component.input.primaryColor }   ><${videocam_off}/></span>
       </if>
-   </if>
+      <else>
+         <span onMouseOut("mouseOut") onMouseEnter("mouseEnter") onClick("onClick", VIDEO_TOGGLE, true, component.input.tracks[1].isLocal())   style={ color: component.input.primaryColor }  ><${videocam}/></span>
+      </else>
+   </div>
    <if(component.input.isPresenting)>
       <span.cb__video__screenSharing><${screen_sharing}/></span>
    </if>
 </div>
-
