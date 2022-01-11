@@ -57,15 +57,24 @@ class  {
       input.conferenceInitialized(conference);
 
       const setupLocalStream = async ()=> {
-         const tracks = await SariskaMediaTransport.createLocalTracks({devices:["audio", "video"], resolution: "180"});
-         this.state.localTracks = tracks;
-         
-         const [ audioTrack, videoTrack] = tracks;
+         let audioTrack, videoTrack;
+         try {
+              [ audioTrack ] = await SariskaMediaTransport.createLocalTracks({devices:["audio"], resolution: "180"});
+         } catch(e) {
+            console.log("e", e);
+         }
 
+         try {
+            [ videoTrack ] = await SariskaMediaTransport.createLocalTracks({devices:["video"], resolution: "180"});
+         } catch(e) {
+            console.log("e", e);
+         }
+
+         this.state.localTracks = [audioTrack, videoTrack];
          await conference.addTrack(audioTrack);
          await conference.addTrack(videoTrack);
 
-         input.tracksInitialized(tracks);
+         input.tracksInitialized(this.state.localTracks);
          this.setStateDirty("localTracks");
       }
 
