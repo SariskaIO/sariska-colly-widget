@@ -17,7 +17,7 @@ class {
 
 
    async createConnection(token, sessionData) {
-      const conn = new SariskaMediaTransport.JitsiConnection(token, sessionData.room.session_id);
+      const conn = new SariskaMediaTransport.JitsiConnection(token, sessionData.session_id);
       conn.addEventListener(SariskaMediaTransport.events.connection.CONNECTION_ESTABLISHED, onConnectionSuccess.bind(this));
       conn.addEventListener(SariskaMediaTransport.events.connection.CONNECTION_FAILED, onConnectionFailed.bind(this));
       conn.addEventListener(SariskaMediaTransport.events.connection.CONNECTION_DISCONNECTED, onConnectionDisconnected.bind(this));
