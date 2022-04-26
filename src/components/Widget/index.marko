@@ -178,6 +178,7 @@ class {
       }
 
       documentClick(e) {
+          this.skipMousemove = true;
          if ( this.state.widgetState === Constants.PRIMARY_BUTTON_WITH_INPUT && !skipToolbox(e.target || e.srcElement)) {
             this.state.widgetState = Constants.PRIMARY_BUTTON;
          }
@@ -438,8 +439,8 @@ class {
       mouseUp() {
          setTimeout(()=>{ this.state.isMouseDown = false}, false);
          clearTimeout(this.timeout);
-         this.skipMousemove = false;
-         document.removeEventListener("mousemove", this.mouseMoveRef, true);
+         this.skipMousemove = true;
+         document.removeEventListener("mousemove", this.mouseMoveRef );
       }
 
       mouseMove(e) {

@@ -12,12 +12,12 @@ class {
       this.updateNetwork = this.updateNetwork.bind(this);
       window.addEventListener("offline", this.updateNetwork);
       window.addEventListener("online", this.updateNetwork);
-      this.createConnection(input.token);
+      this.createConnection(input.token, input.sessionData);
    }
 
 
-   async createConnection(token) {
-      const conn = new SariskaMediaTransport.JitsiConnection(token);
+   async createConnection(token, sessionData) {
+      const conn = new SariskaMediaTransport.JitsiConnection(token, sessionData.room.session_id);
       conn.addEventListener(SariskaMediaTransport.events.connection.CONNECTION_ESTABLISHED, onConnectionSuccess.bind(this));
       conn.addEventListener(SariskaMediaTransport.events.connection.CONNECTION_FAILED, onConnectionFailed.bind(this));
       conn.addEventListener(SariskaMediaTransport.events.connection.CONNECTION_DISCONNECTED, onConnectionDisconnected.bind(this));
